@@ -1,0 +1,96 @@
+export interface User {
+  uid: string;
+  email: string;
+  displayName: string;
+  photoURL?: string;
+  role: 'artist' | 'client' | 'admin';
+  createdAt: Date;
+}
+
+export interface Artist extends User {
+  bio?: string;
+  specialties: string[];
+  location?: string;
+  website?: string;
+  socialLinks?: {
+    instagram?: string;
+    twitter?: string;
+    facebook?: string;
+  };
+}
+
+export interface Artwork {
+  id: string;
+  artistId: string;
+  artistName: string;
+  title: string;
+  description: string;
+  category: string;
+  imageUrl: string;
+  thumbnailUrl: string;
+  price?: number;
+  dimensions?: string;
+  medium?: string;
+  year?: number;
+  tags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  isAvailable: boolean;
+}
+
+export interface Order {
+  id: string;
+  artworkId: string;
+  artistId: string;
+  artistName: string;
+  clientId: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  requirements?: string;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  orderDate: any;
+  artwork: {
+    title: string;
+    imageUrl: string;
+    price?: number;
+    category: string;
+  };
+}
+
+export interface ClientRequirement {
+  id: string;
+  clientId: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  description: string;
+  category?: string;
+  budget?: number;
+  deadline?: any;
+  status: 'open' | 'shared' | 'assigned' | 'in-progress' | 'completed';
+  createdAt: any;
+  sharedWith?: string[]; // Array of artist IDs
+  acceptedBy?: {
+    artistId: string;
+    artistName: string;
+    artistEmail: string;
+    acceptedAt: any;
+  };
+  workCompleted?: {
+    artistId: string;
+    artistName: string;
+    artistEmail: string;
+    completedAt: any;
+    notes?: string;
+  };
+}
+
+export interface SharedRequirement {
+  id: string;
+  requirementId: string;
+  artistId: string;
+  sharedAt: any;
+  status: 'pending' | 'accepted' | 'declined' | 'completed';
+  requirement: ClientRequirement;
+}

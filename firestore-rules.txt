@@ -1,0 +1,43 @@
+// Firestore Security Rules
+// Copy these rules to your Firebase Console -> Firestore Database -> Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read and write their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null; // Allow other users to read basic profile info
+    }
+    
+    // Artworks - artists can manage their own, everyone can read published ones
+    match /artworks/{artworkId} {
+      allow read: if resource.data.isAvailable == true || 
+                     (request.auth != null && request.auth.uid == resource.data.artistId);
+      allow create: if request.auth != null && 
+                       request.auth.uid == request.resource.data.artistId;
+      allow update, delete: if request.auth != null && 
+                               request.auth.uid == resource.data.artistId;
+    }
+    
+    // Orders - clients can create, artists and admins can read their related orders
+    match /orders/{orderId} {
+      allow read: if request.auth != null && 
+                     (request.auth.uid == resource.data.clientId || 
+                      request.auth.uid == resource.data.artistId ||
+                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && 
+                       get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Requirements - clients can create, admins can read and update
+    match /requirements/{requirementId} {
+      allow read, update: if request.auth != null && 
+                             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow create: if request.auth != null;
+      allow read: if request.auth != null && 
+                     request.auth.uid == resource.data.clientId;
+    }
+  }
+}
