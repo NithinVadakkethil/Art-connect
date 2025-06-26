@@ -36,7 +36,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Palette className="text-purple-600" size={32} />
-            <span className="text-2xl font-bold text-gray-800">ArtistHub</span>
+            <span className="text-2xl font-bold text-gray-800">ArtConnect</span>
           </Link>
 
           {/* Desktop Navigation */}

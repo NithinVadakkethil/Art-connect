@@ -49,7 +49,7 @@ export default function Register() {
             <div className="flex justify-center">
               <Palette className="text-purple-600" size={48} />
             </div>
-            <h2 className="mt-4 text-3xl font-bold text-gray-900">Join ArtistHub</h2>
+            <h2 className="mt-4 text-3xl font-bold text-gray-900">Join ArtConnect</h2>
             <p className="mt-2 text-sm text-gray-600">
               Create your account and start your artistic journey
             </p>

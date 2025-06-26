@@ -1,16 +1,16 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { 
-  onAuthStateChanged, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut,
-  updateProfile
-} from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
-import toast from 'react-hot-toast';
+  updateProfile,
+} from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
@@ -24,21 +24,25 @@ export function AuthProvider({ children }) {
 
   async function signup(email, password, userData) {
     try {
-      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const result = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       await updateProfile(result.user, {
-        displayName: userData.name
+        displayName: userData.name,
       });
-      
+
       // Create user profile in Firestore
-      await setDoc(doc(db, 'users', result.user.uid), {
+      await setDoc(doc(db, "users", result.user.uid), {
         name: userData.name,
         email: email,
         isArtist: userData.isArtist || false,
         createdAt: new Date().toISOString(),
-        profileComplete: false
+        profileComplete: false,
       });
 
-      toast.success('Account created successfully!');
+      toast.success("Account created successfully!");
       return result;
     } catch (error) {
       toast.error(error.message);
@@ -49,7 +53,7 @@ export function AuthProvider({ children }) {
   async function login(email, password) {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
-      toast.success('Logged in successfully!');
+      toast.success("Logged in successfully!");
       return result;
     } catch (error) {
       toast.error(error.message);
@@ -60,19 +64,19 @@ export function AuthProvider({ children }) {
   async function logout() {
     try {
       await signOut(auth);
-      toast.success('Logged out successfully!');
+      toast.success("Logged out successfully!");
     } catch (error) {
-      toast.error('Error logging out');
+      toast.error("Error logging out");
     }
   }
 
   async function getUserProfile(uid) {
     try {
-      const docRef = doc(db, 'users', uid);
+      const docRef = doc(db, "users", uid);
       const docSnap = await getDoc(docRef);
       return docSnap.exists() ? docSnap.data() : null;
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error("Error fetching user profile:", error);
       return null;
     }
   }
@@ -96,7 +100,7 @@ export function AuthProvider({ children }) {
     signup,
     login,
     logout,
-    getUserProfile
+    getUserProfile,
   };
 
   return (

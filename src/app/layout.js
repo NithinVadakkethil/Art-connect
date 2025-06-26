@@ -8,28 +8,28 @@ import Footer from '@/components/Footer';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'ArtistHub - Connect with Talented Artists',
-  description: 'Discover amazing artists, showcase your artwork, find art opportunities, and connect with the creative community. Join ArtistHub today!',
+  title: 'ArtConnect - Connect with Talented Artists',
+  description: 'Discover amazing artists, showcase your artwork, find art opportunities, and connect with the creative community. Join ArtConnect today!',
   keywords: 'artists, artwork, paintings, drawings, art gallery, creative community, art jobs, custom art, art marketplace',
-  authors: [{ name: 'ArtistHub Team' }],
+  authors: [{ name: 'ArtConnect Team' }],
   openGraph: {
-    title: 'ArtistHub - Connect with Talented Artists',
+    title: 'ArtConnect - Connect with Talented Artists',
     description: 'Discover amazing artists, showcase your artwork, find art opportunities, and connect with the creative community.',
-    url: 'https://artisthub.com',
-    siteName: 'ArtistHub',
+    url: 'https://ArtConnect.com',
+    siteName: 'ArtConnect',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'ArtistHub - Connect with Artists'
+        alt: 'ArtConnect - Connect with Artists'
       }
     ],
     type: 'website'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ArtistHub - Connect with Talented Artists',
+    title: 'ArtConnect - Connect with Talented Artists',
     description: 'Discover amazing artists, showcase your artwork, and find art opportunities.',
     images: ['/og-image.jpg']
   },
@@ -50,7 +50,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <link rel="canonical" href="https://artisthub.com" />
+        <link rel="canonical" href="https://ArtConnect.com" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </head>

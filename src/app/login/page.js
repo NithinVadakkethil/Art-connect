@@ -41,7 +41,7 @@ export default function Login() {
             </div>
             <h2 className="mt-4 text-3xl font-bold text-gray-900">Welcome Back</h2>
             <p className="mt-2 text-sm text-gray-600">
-              Sign in to your ArtistHub account
+              Sign in to your ArtConnect account
             </p>
           </div>
 
