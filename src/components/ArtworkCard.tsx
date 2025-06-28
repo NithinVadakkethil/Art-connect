@@ -12,7 +12,7 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork }) => {
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow group">
       <div className="relative">
         <img
-          src={artwork.thumbnailUrl || artwork.imageUrl || 'https://images.pexels.com/photos/1053924/pexels-photo-1053924.jpeg'}
+          src={artwork.imageUrl ? artwork.imageUrl.replace('/upload/', '/upload/w_400,h_300,c_fill,q_auto/') : 'https://images.pexels.com/photos/1053924/pexels-photo-1053924.jpeg'}
           alt={artwork.title}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { db, storage } from '../../config/firebase';
+// Firebase Storage imports for upload removed: ref, uploadBytes, getDownloadURL, deleteObject (from firebase/storage)
+// Storage import removed: storage
+import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Artwork, SharedRequirement } from '../../types';
 import { Helmet } from 'react-helmet-async';
 import { Upload, Image, Trash2, Edit, Eye, Plus, X, MessageSquare, Check, Clock, User, Mail, Phone, Calendar, DollarSign, AlertCircle, CheckCircle, FileText } from 'lucide-react';
-import { compressImage, createThumbnail } from '../../utils/imageOptimization';
+// Image optimization imports removed: compressImage, createThumbnail
 import toast from 'react-hot-toast';
 
 const Dashboard: React.FC = () => {
@@ -84,36 +85,44 @@ const Dashboard: React.FC = () => {
     }
 
     setUploadProgress(true);
+    const CLOUD_NAME = 'dlsgpthqy';
+    const UPLOAD_PRESET = 'artist_upload_preset';
+    const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+
     try {
-      // Compress images
-      const compressedImage = await compressImage(formData.image);
-      const thumbnail = await createThumbnail(formData.image);
+      const data = new FormData();
+      data.append('file', formData.image as File);
+      data.append('upload_preset', UPLOAD_PRESET);
 
-      // Create unique filenames with timestamp
-      const timestamp = Date.now();
-      const sanitizedFileName = formData.image.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-      
-      // Upload images to Firebase Storage with proper paths
-      const imageRef = ref(storage, `artworks/${currentUser.uid}/${timestamp}_${sanitizedFileName}`);
-      const thumbnailRef = ref(storage, `thumbnails/${currentUser.uid}/${timestamp}_thumb_${sanitizedFileName}`);
+      let cloudinaryResponse;
+      try {
+        const res = await fetch(UPLOAD_URL, {
+          method: 'POST',
+          body: data,
+        });
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.error('Cloudinary upload failed:', errorData);
+          throw new Error(`Cloudinary upload failed: ${errorData.error.message || res.statusText}`);
+        }
+        cloudinaryResponse = await res.json();
+        console.log('Cloudinary upload successful:', cloudinaryResponse);
+      } catch (uploadError) {
+        console.error('Error uploading to Cloudinary:', uploadError);
+        toast.error(`Upload failed: ${uploadError.message || 'Could not connect to Cloudinary.'}`);
+        setUploadProgress(false);
+        return;
+      }
 
-      // Upload files sequentially to avoid CORS issues
-      const imageSnapshot = await uploadBytes(imageRef, compressedImage);
-      const thumbnailSnapshot = await uploadBytes(thumbnailRef, thumbnail);
-
-      // Get download URLs
-      const imageUrl = await getDownloadURL(imageSnapshot.ref);
-      const thumbnailUrl = await getDownloadURL(thumbnailSnapshot.ref);
-
-      // Save artwork data to Firestore
       const artworkData = {
         artistId: currentUser.uid,
         artistName: currentUser.displayName,
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        imageUrl,
-        thumbnailUrl,
+        imageUrl: cloudinaryResponse.secure_url,
+        publicId: cloudinaryResponse.public_id, // Store public_id for potential future management
+        // thumbnailUrl will be generated dynamically or via Cloudinary transformations
         price: formData.price ? parseFloat(formData.price) : null,
         dimensions: formData.dimensions || null,
         medium: formData.medium || null,
@@ -121,10 +130,23 @@ const Dashboard: React.FC = () => {
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
         createdAt: new Date(),
         updatedAt: new Date(),
-        isAvailable: true
+        isAvailable: true,
       };
 
-      await addDoc(collection(db, 'artworks'), artworkData);
+      try {
+        await addDoc(collection(db, 'artworks'), artworkData);
+      } catch (firestoreError) {
+        console.error('Error saving artwork data to Firestore:', firestoreError);
+        toast.error('Failed to save artwork details. Please try again.');
+        // Note: If Firestore fails, the image is already on Cloudinary.
+        // Implementing a robust cleanup for this client-side is complex
+        // and might require a backend function to delete from Cloudinary securely.
+        // For now, we'll log this and alert the user.
+        console.warn('Orphaned image on Cloudinary possible due to Firestore save error. Public ID:', cloudinaryResponse.public_id);
+        toast.error('Artwork data save failed. Please contact support if the image was uploaded but not listed.');
+        setUploadProgress(false);
+        return;
+      }
       
       toast.success('Artwork uploaded successfully!');
       setShowUploadForm(false);
@@ -140,40 +162,34 @@ const Dashboard: React.FC = () => {
         image: null
       });
       
-      fetchData();
-    } catch (error) {
-      console.error('Error uploading artwork:', error);
-      if (error.code === 'storage/unauthorized') {
-        toast.error('Upload failed: Please check Firebase Storage rules');
-      } else if (error.code === 'storage/cors') {
-        toast.error('Upload failed: CORS configuration needed');
-      } else {
-        toast.error('Failed to upload artwork. Please try again.');
-      }
+      fetchData(); // Refresh data
+    } catch (error) { // General catch-all for unexpected errors
+      console.error('Unexpected error during artwork upload:', error);
+      toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setUploadProgress(false);
     }
   };
 
   const handleDelete = async (artwork: Artwork) => {
-    if (!confirm('Are you sure you want to delete this artwork?')) return;
+    if (!confirm('Are you sure you want to delete this artwork? This will remove the artwork listing but the image will remain on Cloudinary for now.')) return;
 
     try {
-      // Delete images from storage
-      const imageRef = ref(storage, artwork.imageUrl);
-      const thumbnailRef = ref(storage, artwork.thumbnailUrl);
-      
-      await Promise.all([
-        deleteObject(imageRef).catch(() => {}), // Ignore errors if file doesn't exist
-        deleteObject(thumbnailRef).catch(() => {}),
-        deleteDoc(doc(db, 'artworks', artwork.id))
-      ]);
+      // Delete artwork document from Firestore
+      await deleteDoc(doc(db, 'artworks', artwork.id));
 
-      toast.success('Artwork deleted successfully');
+      toast.success('Artwork listing deleted successfully. The image file still exists on Cloudinary.');
+      // Note: To delete the actual image from Cloudinary, a backend function
+      // is needed to securely use the Cloudinary Admin API with the artwork's publicId.
+      if (artwork.publicId) {
+        console.warn(`Artwork ${artwork.id} (Cloudinary public_id: ${artwork.publicId}) deleted from Firestore. Corresponding image on Cloudinary was not deleted.`);
+      } else {
+        console.warn(`Artwork ${artwork.id} deleted from Firestore. Corresponding image on Cloudinary was not deleted (no public_id found).`);
+      }
       fetchData();
     } catch (error) {
-      console.error('Error deleting artwork:', error);
-      toast.error('Failed to delete artwork');
+      console.error('Error deleting artwork listing:', error);
+      toast.error('Failed to delete artwork listing.');
     }
   };
 
@@ -453,7 +469,7 @@ const Dashboard: React.FC = () => {
                         <div key={artwork.id} className="border border-gray-200 rounded-lg overflow-hidden">
                           <div className="relative">
                             <img
-                              src={artwork.thumbnailUrl || artwork.imageUrl}
+                              src={artwork.imageUrl.replace('/upload/', '/upload/w_300,h_300,c_fill,q_auto/')}
                               alt={artwork.title}
                               className="w-full h-48 object-cover"
                             />
