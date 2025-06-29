@@ -25,12 +25,12 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <Palette className="h-8 w-8 text-indigo-600" />
-            <span className="text-xl font-bold text-gray-900">ArtistHub</span>
+            <Palette className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
+            <span className="text-lg sm:text-xl font-bold text-gray-900">ArtistHub</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-6 lg:space-x-8">
             <Link
               to="/"
               className={`text-sm font-medium transition-colors ${
@@ -93,7 +93,7 @@ const Header: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <div className="flex items-center space-x-2 text-gray-700">
                   <User className="h-5 w-5" />
-                  <span className="text-sm font-medium">{currentUser.displayName}</span>
+                  <span className="text-sm font-medium truncate max-w-24 lg:max-w-none">{currentUser.displayName}</span>
                   <span className="text-xs px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full">
                     {currentUser.role}
                   </span>
@@ -208,7 +208,7 @@ const Header: React.FC = () => {
                   )}
                   <div className="flex items-center space-x-2 pt-2 border-t border-gray-200">
                     <User className="h-5 w-5 text-gray-400" />
-                    <span className="text-sm text-gray-700">{currentUser.displayName}</span>
+                    <span className="text-sm text-gray-700 truncate">{currentUser.displayName}</span>
                     <span className="text-xs px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full">
                       {currentUser.role}
                     </span>

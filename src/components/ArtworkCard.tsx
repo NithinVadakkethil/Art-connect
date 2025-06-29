@@ -1,21 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Artwork } from '../types';
-import { Heart, Eye, User } from 'lucide-react';
+import { Heart, Eye, User, Palette } from 'lucide-react';
 
 interface ArtworkCardProps {
   artwork: Artwork;
+  showPrice?: boolean;
 }
 
-const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork }) => {
+const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, showPrice = false }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow group">
       <div className="relative">
-        <img
-          src={artwork.imageUrl ? artwork.imageUrl.replace('/upload/', '/upload/w_400,h_300,c_fill,q_auto/') : 'https://images.pexels.com/photos/1053924/pexels-photo-1053924.jpeg'}
-          alt={artwork.title}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+        <div className="aspect-square overflow-hidden">
+          <img
+            src={artwork.imageUrl ? artwork.imageUrl.replace('/upload/', '/upload/w_400,h_400,c_fill,q_auto/') : 'https://images.pexels.com/photos/1053924/pexels-photo-1053924.jpeg'}
+            alt={artwork.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        </div>
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300">
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <button className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-50 transition-colors">
@@ -32,8 +35,18 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork }) => {
             </Link>
           </div>
         </div>
-        {artwork.price && (
-          <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-sm font-medium">
+        
+        {/* Customizable Badge */}
+        {artwork.isCustomizable && (
+          <div className="absolute top-2 left-2 bg-purple-500 text-white px-2 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+            <Palette className="h-3 w-3" />
+            <span>Customizable</span>
+          </div>
+        )}
+        
+        {/* Price Badge - Only show if showPrice is true */}
+        {showPrice && artwork.price && (
+          <div className="absolute bottom-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-sm font-medium">
             ${artwork.price}
           </div>
         )}
@@ -69,10 +82,13 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork }) => {
         
         <div className="mt-3 pt-3 border-t border-gray-100">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-500">
-              {artwork.year && `${artwork.year} • `}
-              {artwork.medium}
-            </span>
+            <div className="flex items-center space-x-2">
+              {artwork.isCustomizable && (
+                <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded">
+                  Can be customized
+                </span>
+              )}
+            </div>
             <Link
               to={`/artwork/${artwork.id}`}
               className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"

@@ -3,7 +3,7 @@ import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Artwork } from '../types';
 import { Helmet } from 'react-helmet-async';
-import { Search, Filter, Heart, Eye } from 'lucide-react';
+import { Search, Filter, Eye, Palette } from 'lucide-react';
 import ArtworkCard from '../components/ArtworkCard';
 
 const Gallery: React.FC = () => {
@@ -12,7 +12,7 @@ const Gallery: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('newest');
+  const [showCustomizable, setShowCustomizable] = useState('all');
 
   const categories = ['all', 'painting', 'drawing', 'digital', 'sculpture', 'photography'];
 
@@ -21,8 +21,8 @@ const Gallery: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    filterAndSortArtworks();
-  }, [artworks, searchTerm, selectedCategory, sortBy]);
+    filterArtworks();
+  }, [artworks, searchTerm, selectedCategory, showCustomizable]);
 
   const fetchArtworks = async () => {
     try {
@@ -46,7 +46,7 @@ const Gallery: React.FC = () => {
     }
   };
 
-  const filterAndSortArtworks = () => {
+  const filterArtworks = () => {
     let filtered = artworks;
 
     // Filter by search term
@@ -66,23 +66,11 @@ const Gallery: React.FC = () => {
       );
     }
 
-    // Sort artworks
-    switch (sortBy) {
-      case 'newest':
-        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
-      case 'oldest':
-        filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-        break;
-      case 'price-low':
-        filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
-        break;
-      case 'price-high':
-        filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
-        break;
-      case 'title':
-        filtered.sort((a, b) => a.title.localeCompare(b.title));
-        break;
+    // Filter by customizable
+    if (showCustomizable === 'customizable') {
+      filtered = filtered.filter(artwork => artwork.isCustomizable);
+    } else if (showCustomizable === 'fixed') {
+      filtered = filtered.filter(artwork => !artwork.isCustomizable);
     }
 
     setFilteredArtworks(filtered);
@@ -110,12 +98,12 @@ const Gallery: React.FC = () => {
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             <div className="text-center">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 Art Gallery
               </h1>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
                 Discover unique artworks from talented artists around the world
               </p>
             </div>
@@ -123,15 +111,15 @@ const Gallery: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Search */}
-              <div className="relative">
+              <div className="relative sm:col-span-2 lg:col-span-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
                   type="text"
-                  placeholder="Search artworks, artists, or tags..."
+                  placeholder="Search artworks..."
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -154,18 +142,17 @@ const Gallery: React.FC = () => {
                 </select>
               </div>
 
-              {/* Sort */}
-              <div>
+              {/* Customizable Filter */}
+              <div className="relative">
+                <Palette className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <select
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                  value={showCustomizable}
+                  onChange={(e) => setShowCustomizable(e.target.value)}
                 >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="title">Title A-Z</option>
+                  <option value="all">All Artworks</option>
+                  <option value="customizable">Customizable Only</option>
+                  <option value="fixed">Fixed Artworks</option>
                 </select>
               </div>
             </div>
@@ -174,10 +161,16 @@ const Gallery: React.FC = () => {
 
         {/* Results */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          <div className="mb-6">
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
             <p className="text-gray-600">
               Showing {filteredArtworks.length} of {artworks.length} artworks
             </p>
+            <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                <span>Customizable</span>
+              </div>
+            </div>
           </div>
 
           {filteredArtworks.length === 0 ? (
@@ -191,9 +184,9 @@ const Gallery: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {filteredArtworks.map(artwork => (
-                <ArtworkCard key={artwork.id} artwork={artwork} />
+                <ArtworkCard key={artwork.id} artwork={artwork} showPrice={false} />
               ))}
             </div>
           )}

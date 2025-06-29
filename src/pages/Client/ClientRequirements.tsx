@@ -4,11 +4,13 @@ import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Helmet } from 'react-helmet-async';
 import { MessageSquare, Send, Palette, DollarSign, Calendar, Tag } from 'lucide-react';
+import FileUpload from '../../components/FileUpload';
 import toast from 'react-hot-toast';
 
 const ClientRequirements: React.FC = () => {
   const { currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(false);
   const [formData, setFormData] = useState({
     clientName: currentUser?.displayName || '',
     clientEmail: currentUser?.email || '',
@@ -16,7 +18,8 @@ const ClientRequirements: React.FC = () => {
     description: '',
     category: '',
     budget: '',
-    deadline: ''
+    deadline: '',
+    attachment: null as File | null
   });
 
   const categories = ['painting', 'drawing', 'digital', 'sculpture', 'photography', 'mixed-media', 'other'];
@@ -29,7 +32,45 @@ const ClientRequirements: React.FC = () => {
     }
 
     setLoading(true);
+    
     try {
+      let attachmentUrl = null;
+      let attachmentPublicId = null;
+
+      // Upload attachment if provided
+      if (formData.attachment) {
+        setUploadProgress(true);
+        const CLOUD_NAME = 'dlsgpthqy';
+        const UPLOAD_PRESET = 'artist_upload_preset';
+        const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+
+        const data = new FormData();
+        data.append('file', formData.attachment);
+        data.append('upload_preset', UPLOAD_PRESET);
+
+        try {
+          const res = await fetch(UPLOAD_URL, {
+            method: 'POST',
+            body: data,
+          });
+          if (!res.ok) {
+            const errorData = await res.json();
+            console.error('Cloudinary upload failed:', errorData);
+            throw new Error(`Cloudinary upload failed: ${errorData.error?.message || res.statusText}`);
+          }
+          const cloudinaryResponse = await res.json();
+          attachmentUrl = cloudinaryResponse.secure_url;
+          attachmentPublicId = cloudinaryResponse.public_id;
+        } catch (uploadError: any) {
+          console.error('Error uploading to Cloudinary:', uploadError);
+          toast.error(`Attachment upload failed: ${uploadError.message || 'Could not connect to Cloudinary.'}`);
+          setLoading(false);
+          setUploadProgress(false);
+          return;
+        }
+        setUploadProgress(false);
+      }
+
       const requirementData = {
         clientId: currentUser?.uid || 'guest',
         clientName: formData.clientName,
@@ -39,6 +80,8 @@ const ClientRequirements: React.FC = () => {
         category: formData.category || null,
         budget: formData.budget ? parseFloat(formData.budget) : null,
         deadline: formData.deadline ? new Date(formData.deadline) : null,
+        attachmentUrl,
+        attachmentPublicId,
         status: 'open',
         createdAt: new Date()
       };
@@ -55,7 +98,8 @@ const ClientRequirements: React.FC = () => {
         description: '',
         category: '',
         budget: '',
-        deadline: ''
+        deadline: '',
+        attachment: null
       });
     } catch (error) {
       console.error('Error submitting requirement:', error);
@@ -74,24 +118,24 @@ const ClientRequirements: React.FC = () => {
       </Helmet>
 
       <div className="min-h-screen bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
           {/* Header */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 sm:mb-12">
             <div className="flex justify-center mb-4">
               <div className="bg-indigo-100 rounded-full p-3">
                 <MessageSquare className="h-8 w-8 text-indigo-600" />
               </div>
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Tell Us About Your Art Requirements
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
               Looking for custom artwork? Share your vision with us and we'll connect you with the perfect artist to bring your ideas to life.
             </p>
           </div>
 
           {/* Form */}
-          <div className="bg-white rounded-lg shadow-lg p-8">
+          <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Personal Information */}
               <div>
@@ -160,6 +204,18 @@ const ClientRequirements: React.FC = () => {
                   <p className="text-xs text-gray-500 mt-1">
                     The more details you provide, the better we can match you with the right artist.
                   </p>
+                </div>
+
+                {/* Reference Image Upload */}
+                <div className="mt-4">
+                  <FileUpload
+                    onFileSelect={(file) => setFormData({...formData, attachment: file})}
+                    selectedFile={formData.attachment}
+                    accept="image/*"
+                    label="Reference Image (Optional)"
+                    description="Upload any reference images, sketches, or inspiration photos to help artists understand your vision."
+                    disabled={loading || uploadProgress}
+                  />
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -231,18 +287,20 @@ const ClientRequirements: React.FC = () => {
                 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || uploadProgress}
                   className="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
                   <Send className="h-5 w-5" />
-                  <span>{loading ? 'Submitting...' : 'Submit Requirements'}</span>
+                  <span>
+                    {uploadProgress ? 'Uploading...' : loading ? 'Submitting...' : 'Submit Requirements'}
+                  </span>
                 </button>
               </div>
             </form>
           </div>
 
           {/* Additional Information */}
-          <div className="mt-12 bg-white rounded-lg shadow-sm p-6">
+          <div className="mt-8 sm:mt-12 bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">How It Works</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">

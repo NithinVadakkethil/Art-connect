@@ -5,7 +5,7 @@ import { db } from '../config/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { Artwork } from '../types';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, Heart, Share2, User, Calendar, Tag, DollarSign, Ruler, Palette, Phone, Mail, MessageSquare } from 'lucide-react';
+import { ArrowLeft, User, Tag, Palette, Phone, Mail, MessageSquare, Edit } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const ArtworkDetail: React.FC = () => {
@@ -18,7 +18,8 @@ const ArtworkDetail: React.FC = () => {
     clientName: currentUser?.displayName || '',
     clientEmail: currentUser?.email || '',
     clientPhone: '',
-    requirements: ''
+    requirements: '',
+    alterationDescription: ''
   });
 
   useEffect(() => {
@@ -31,7 +32,13 @@ const ArtworkDetail: React.FC = () => {
     try {
       const artworkDoc = await getDoc(doc(db, 'artworks', artworkId));
       if (artworkDoc.exists()) {
-        setArtwork({ id: artworkDoc.id, ...artworkDoc.data() } as Artwork);
+        const artworkData = artworkDoc.data();
+        // Ensure isCustomizable is always a boolean, defaulting to false if undefined
+        setArtwork({ 
+          id: artworkDoc.id, 
+          ...artworkData,
+          isCustomizable: artworkData.isCustomizable ?? false
+        } as Artwork);
       }
     } catch (error) {
       console.error('Error fetching artwork:', error);
@@ -58,13 +65,15 @@ const ArtworkDetail: React.FC = () => {
         clientEmail: orderFormData.clientEmail,
         clientPhone: orderFormData.clientPhone,
         requirements: orderFormData.requirements,
+        alterationDescription: orderFormData.alterationDescription,
         status: 'pending',
         orderDate: new Date(),
         artwork: {
           title: artwork.title,
           imageUrl: artwork.imageUrl,
           price: artwork.price,
-          category: artwork.category
+          category: artwork.category,
+          isCustomizable: artwork.isCustomizable
         }
       });
 
@@ -74,7 +83,8 @@ const ArtworkDetail: React.FC = () => {
         clientName: currentUser?.displayName || '',
         clientEmail: currentUser?.email || '',
         clientPhone: '',
-        requirements: ''
+        requirements: '',
+        alterationDescription: ''
       });
     } catch (error) {
       console.error('Error submitting order:', error);
@@ -116,9 +126,9 @@ const ArtworkDetail: React.FC = () => {
       </Helmet>
 
       <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
           {/* Back Button */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <Link
               to="/gallery"
               className="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors"
@@ -128,50 +138,45 @@ const ArtworkDetail: React.FC = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Image Section */}
             <div className="space-y-4">
               <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <img
-                  src={artwork.imageUrl}
-                  alt={artwork.title}
-                  className="w-full h-96 lg:h-[600px] object-cover"
-                />
-              </div>
-              
-              <div className="flex space-x-4">
-                <button className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                  <Heart className="h-4 w-4" />
-                  <span>Save</span>
-                </button>
-                <button className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                  <Share2 className="h-4 w-4" />
-                  <span>Share</span>
-                </button>
+                <div className="relative">
+                  <img
+                    src={artwork.imageUrl}
+                    alt={artwork.title}
+                    className="w-full h-auto object-contain max-h-[80vh]"
+                    style={{ aspectRatio: 'auto' }}
+                  />
+                </div>
               </div>
             </div>
 
             {/* Details Section */}
             <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{artwork.title}</h1>
+              <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{artwork.title}</h1>
                 
                 <div className="flex items-center space-x-2 mb-4">
                   <User className="h-5 w-5 text-gray-400" />
                   <span className="text-lg text-gray-700">by {artwork.artistName}</span>
                 </div>
 
-                {artwork.price && (
+                {/* Customizable Badge */}
+                {artwork.isCustomizable && (
                   <div className="flex items-center space-x-2 mb-4">
-                    <DollarSign className="h-5 w-5 text-green-600" />
-                    <span className="text-2xl font-bold text-green-600">${artwork.price}</span>
+                    <div className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                      <Palette className="h-4 w-4" />
+                      <span>This artwork can be customized</span>
+                    </div>
                   </div>
                 )}
 
                 <p className="text-gray-700 mb-6">{artwork.description}</p>
 
                 {/* Artwork Details */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                   <div className="flex items-center space-x-2">
                     <Tag className="h-4 w-4 text-gray-400" />
                     <div>
@@ -179,36 +184,6 @@ const ArtworkDetail: React.FC = () => {
                       <span className="text-gray-900 capitalize">{artwork.category}</span>
                     </div>
                   </div>
-                  
-                  {artwork.medium && (
-                    <div className="flex items-center space-x-2">
-                      <Palette className="h-4 w-4 text-gray-400" />
-                      <div>
-                        <span className="block text-sm text-gray-500">Medium</span>
-                        <span className="text-gray-900">{artwork.medium}</span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {artwork.dimensions && (
-                    <div className="flex items-center space-x-2">
-                      <Ruler className="h-4 w-4 text-gray-400" />
-                      <div>
-                        <span className="block text-sm text-gray-500">Dimensions</span>
-                        <span className="text-gray-900">{artwork.dimensions}</span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {artwork.year && (
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-gray-400" />
-                      <div>
-                        <span className="block text-sm text-gray-500">Year</span>
-                        <span className="text-gray-900">{artwork.year}</span>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Tags */}
@@ -228,9 +203,10 @@ const ArtworkDetail: React.FC = () => {
                 {/* Order Button */}
                 <button
                   onClick={() => setShowOrderForm(true)}
-                  className="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+                  className="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center space-x-2"
                 >
-                  Order This Artwork
+                  <MessageSquare className="h-5 w-5" />
+                  <span>Order This Artwork</span>
                 </button>
               </div>
             </div>
@@ -240,8 +216,8 @@ const ArtworkDetail: React.FC = () => {
         {/* Order Form Modal */}
         {showOrderForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg max-w-md w-full p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Order Artwork</h2>
+            <div className="bg-white rounded-lg max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Order Artwork</h2>
               <p className="text-gray-600 mb-6">Fill in your details to order "{artwork.title}"</p>
               
               <form onSubmit={handleOrderSubmit} className="space-y-4">
@@ -296,8 +272,28 @@ const ArtworkDetail: React.FC = () => {
                     onChange={(e) => setOrderFormData({...orderFormData, requirements: e.target.value})}
                   />
                 </div>
+
+                {/* Alteration Description for Customizable Artworks */}
+                {artwork.isCustomizable && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <Edit className="inline h-4 w-4 mr-1" />
+                      Customization Request
+                    </label>
+                    <textarea
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Describe how you'd like this artwork to be customized (colors, size, elements, etc.)..."
+                      value={orderFormData.alterationDescription}
+                      onChange={(e) => setOrderFormData({...orderFormData, alterationDescription: e.target.value})}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Since this artwork is customizable, please describe any changes you'd like the artist to make.
+                    </p>
+                  </div>
+                )}
                 
-                <div className="flex space-x-4">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                   <button
                     type="button"
                     onClick={() => setShowOrderForm(false)}
