@@ -3,7 +3,7 @@ import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Helmet } from 'react-helmet-async';
-import { MessageSquare, Send, Palette, DollarSign, Calendar, Tag } from 'lucide-react';
+import { MessageSquare, Send, Palette, IndianRupee, Calendar, Tag } from 'lucide-react';
 import FileUpload from '../../components/FileUpload';
 import toast from 'react-hot-toast';
 
@@ -240,8 +240,8 @@ const ClientRequirements: React.FC = () => {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <DollarSign className="inline h-4 w-4 mr-1" />
-                      Budget (USD)
+                      <IndianRupee className="inline h-4 w-4 mr-1" />
+                      Budget (INR)
                     </label>
                     <input
                       type="number"

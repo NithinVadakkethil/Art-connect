@@ -3,7 +3,7 @@ import { collection, getDocs, query, orderBy, updateDoc, doc, addDoc, where, del
 import { db } from '../../config/firebase';
 import { Order, ClientRequirement, User } from '../../types';
 import { Helmet } from 'react-helmet-async';
-import { Users, ShoppingBag, MessageSquare, TrendingUp, Eye, Phone, Mail, Calendar, User as UserIcon, Palette, Share2, Check, X, UserCheck, CheckCircle, DollarSign, Send, Clock, PlayCircle, FileText, Search, Filter, Trash2, ZoomIn } from 'lucide-react';
+import { Users, ShoppingBag, MessageSquare, TrendingUp, Eye, Phone, Mail, Calendar, User as UserIcon, Palette, Share2, Check, X, UserCheck, CheckCircle, IndianRupee, Send, Clock, PlayCircle, FileText, Search, Filter, Trash2, ZoomIn } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const AdminDashboard: React.FC = () => {

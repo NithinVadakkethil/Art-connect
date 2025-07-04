@@ -5,7 +5,7 @@ import { db, storage } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Artwork, SharedRequirement, SharedOrder } from '../../types';
 import { Helmet } from 'react-helmet-async';
-import { Plus, Upload, Edit, Trash2, Eye, Check, X, Clock, DollarSign, User, Calendar, MessageSquare, Palette, Search, Filter, ZoomIn } from 'lucide-react';
+import { Plus, Upload, Edit, Trash2, Eye, Check, X, Clock, IndianRupee, User, Calendar, MessageSquare, Palette, Search, Filter, ZoomIn } from 'lucide-react';
 import { compressImage, createThumbnail } from '../../utils/imageOptimization';
 import FileUpload from '../../components/FileUpload';
 import toast from 'react-hot-toast';
@@ -492,7 +492,7 @@ const Dashboard: React.FC = () => {
             
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex items-center">
-                <DollarSign className="h-8 w-8 text-yellow-600" />
+                <IndianRupee className="h-8 w-8 text-yellow-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Orders</p>
                   <p className="text-2xl font-bold text-gray-900">{sharedOrders.length}</p>
@@ -772,7 +772,7 @@ const Dashboard: React.FC = () => {
 
                   {filteredOrders.length === 0 ? (
                     <div className="text-center py-12">
-                      <DollarSign className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                      <IndianRupee className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                       <h3 className="text-lg font-medium text-gray-900 mb-2">No orders found</h3>
                       <p className="text-gray-600">
                         {orderSearchTerm || orderStatusFilter !== 'all' 
@@ -938,7 +938,7 @@ const Dashboard: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Price (USD)
+                      Price (INR)
                     </label>
                     <input
                       type="number"
