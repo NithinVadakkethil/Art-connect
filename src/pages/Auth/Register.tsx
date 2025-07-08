@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Helmet } from 'react-helmet-async';
-import { Eye, EyeOff, Palette, User, Users } from 'lucide-react';
+import { Eye, EyeOff, Palette, User, Users, Phone } from 'lucide-react';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
-    role: 'client' as 'artist' | 'client'
+    role: 'artist'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,6 +25,19 @@ const Register: React.FC = () => {
     });
   };
 
+  const validatePhone = (phone: string) => {
+    // Remove all spaces and special characters except +
+    const cleanPhone = phone.replace(/[\s-()]/g, '');
+    
+    // Indian phone number validation: +91 followed by 10 digits starting with 6-9
+    const indianPhoneRegex = /^(\+91|91)?[6-9]\d{9}$/;
+    
+    // UAE phone number validation: +971 followed by 9 digits starting with 5
+    const uaePhoneRegex = /^(\+971|971)?[5][0-9]\d{7}$/;
+    
+    return indianPhoneRegex.test(cleanPhone) || uaePhoneRegex.test(cleanPhone);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
@@ -33,9 +47,14 @@ const Register: React.FC = () => {
       return;
     }
 
+    if (!validatePhone(formData.phone)) {
+      alert('Please enter a valid phone number.\nIndia: +91 followed by 10 digits (starting with 6-9)\nUAE: +971 followed by 9 digits (starting with 5)');
+      return;
+    }
+
     setLoading(true);
     try {
-      await register(formData.email, formData.password, formData.name, formData.role);
+      await register(formData.email, formData.password, formData.name, formData.role, formData.phone);
       navigate('/dashboard');
     } catch (error) {
       console.error('Registration error:', error);
@@ -84,10 +103,10 @@ const Register: React.FC = () => {
                 }`}
               >
                 <User className="h-6 w-6 mx-auto mb-2" />
-                <div className="text-sm font-medium">Artist</div>
+                <div className="text-sm font-medium">Artist Signup</div>
                 <div className="text-xs text-gray-500">Showcase your work</div>
               </button>
-              <button
+              {/* <button
                 type="button"
                 onClick={() => setFormData({ ...formData, role: 'client' })}
                 className={`flex-1 p-4 border-2 rounded-lg transition-colors ${
@@ -99,7 +118,7 @@ const Register: React.FC = () => {
                 <Users className="h-6 w-6 mx-auto mb-2" />
                 <div className="text-sm font-medium">Client</div>
                 <div className="text-xs text-gray-500">Discover art</div>
-              </button>
+              </button> */}
             </div>
 
             <div className="rounded-md shadow-sm space-y-4">
@@ -134,6 +153,26 @@ const Register: React.FC = () => {
                   value={formData.email}
                   onChange={handleChange}
                 />
+              </div>
+
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                  Phone Number
+                </label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  required
+                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="India: +91 9876543210 | UAE: +971 501234567"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Enter your phone number with country code (India: +91, UAE: +971)
+                </p>
               </div>
 
               <div>

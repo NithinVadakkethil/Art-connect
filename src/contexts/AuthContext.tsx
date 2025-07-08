@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 interface AuthContextType {
   currentUser: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string, role: 'artist' | 'client') => Promise<void>;
+  register: (email: string, password: string, name: string, role: 'artist' | 'client', phone: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
 }
@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (email: string, password: string, name: string, role: 'artist' | 'client') => {
+  const register = async (email: string, password: string, name: string, role: 'artist' | 'client', phone: string) => {
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       
@@ -56,6 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: user.uid,
         email: user.email!,
         displayName: name,
+        phone: phone,
         role,
         createdAt: new Date()
       };

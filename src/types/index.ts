@@ -3,6 +3,7 @@ export interface User {
   email: string;
   displayName: string;
   photoURL?: string;
+  phone?: string; // Added phone field
   role: 'artist' | 'client' | 'admin';
   createdAt: Date;
 }
@@ -46,6 +47,7 @@ export interface Order {
   clientName: string;
   clientEmail: string;
   clientPhone: string;
+  address: string;
   requirements?: string;
   alterationDescription?: string;
   status: 'pending' | 'shared' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled';
