@@ -3,13 +3,14 @@ import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Artwork } from '../types';
 import { Helmet } from 'react-helmet-async';
-import { Search, Filter, Eye, Palette } from 'lucide-react';
+import { Search, Filter, Eye, Palette, RefreshCw } from 'lucide-react';
 import ArtworkCard from '../components/ArtworkCard';
 
 const Gallery: React.FC = () => {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [filteredArtworks, setFilteredArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showCustomizable, setShowCustomizable] = useState('all');
@@ -24,7 +25,13 @@ const Gallery: React.FC = () => {
     filterArtworks();
   }, [artworks, searchTerm, selectedCategory, showCustomizable]);
 
-  const fetchArtworks = async () => {
+  const fetchArtworks = async (isRefresh = false) => {
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+    
     try {
       const artworksQuery = query(
         collection(db, 'artworks'),
@@ -43,6 +50,7 @@ const Gallery: React.FC = () => {
       console.error('Error fetching artworks:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -76,6 +84,10 @@ const Gallery: React.FC = () => {
     setFilteredArtworks(filtered);
   };
 
+  const handleRefresh = () => {
+    fetchArtworks(true);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -100,9 +112,19 @@ const Gallery: React.FC = () => {
         <div className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             <div className="text-center">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Art Gallery
-              </h1>
+              <div className="flex items-center justify-center space-x-4 mb-4">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
+                  Art Gallery
+                </h1>
+                <button
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  className="p-2 text-gray-600 hover:text-indigo-600 transition-colors disabled:opacity-50"
+                  title="Refresh gallery"
+                >
+                  <RefreshCw className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
               <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
                 Discover unique artworks from talented artists around the world
               </p>
@@ -163,14 +185,18 @@ const Gallery: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
             <p className="text-gray-600">
-              Showing {filteredArtworks.length} of {artworks.length} artworks
+              Showing {filteredArtworks.length} of {artworks.length} published artworks
             </p>
-            <div className="flex items-center space-x-4 text-sm text-gray-600">
+            {/* <div className="flex items-center space-x-4 text-sm text-gray-600">
               <div className="flex items-center space-x-1">
                 <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                 <span>Customizable</span>
               </div>
-            </div>
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span>Published</span>
+              </div>
+            </div> */}
           </div>
 
           {filteredArtworks.length === 0 ? (
@@ -178,10 +204,25 @@ const Gallery: React.FC = () => {
               <div className="text-gray-400 mb-4">
                 <Eye className="h-16 w-16 mx-auto" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No artworks found</h3>
-              <p className="text-gray-600">
-                Try adjusting your search or filter criteria
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {artworks.length === 0 ? 'No published artworks yet' : 'No artworks found'}
+              </h3>
+              <p className="text-gray-600 mb-4">
+                {artworks.length === 0 
+                  ? 'Artists haven\'t published any artworks to the gallery yet'
+                  : 'Try adjusting your search or filter criteria'
+                }
               </p>
+              {artworks.length === 0 && (
+                <button
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center space-x-2 mx-auto"
+                >
+                  <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                  <span>Refresh Gallery</span>
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
