@@ -50,8 +50,8 @@ const Login: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Login - ArtistHub</title>
-        <meta name="description" content="Login to your ArtistHub account to access your dashboard and manage your artworks." />
+        <title>Login - FrameGlobe</title>
+        <meta name="description" content="Login to your FrameGlobe account to access your dashboard and manage your artworks." />
       </Helmet>
 
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

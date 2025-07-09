@@ -21,9 +21,9 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, showPrice = false })
         </div>
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300">
           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-50 transition-colors">
+            {/* <button className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-50 transition-colors">
               <Heart className="h-4 w-4 text-gray-600" />
-            </button>
+            </button> */}
           </div>
           <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <Link

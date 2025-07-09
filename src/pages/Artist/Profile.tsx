@@ -95,7 +95,7 @@ const Profile: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Artist Profile - ArtistHub</title>
+        <title>Artist Profile - FrameGlobe</title>
         <meta name="description" content="Manage your artist profile, update your bio, specialties, and social links." />
       </Helmet>
 
@@ -161,7 +161,7 @@ const Profile: React.FC = () => {
                   <p className="text-gray-900">{currentUser?.email}</p>
                 </div>
                 
-                <div>
+                {/* <div>
                   <div className="flex items-center space-x-2 mb-2">
                     <MapPin className="h-5 w-5 text-gray-400" />
                     <span className="font-medium text-gray-700">Location</span>
@@ -177,7 +177,7 @@ const Profile: React.FC = () => {
                   ) : (
                     <p className="text-gray-900">{profile.location || 'Not specified'}</p>
                   )}
-                </div>
+                </div> */}
               </div>
 
               {/* Bio */}
@@ -225,7 +225,7 @@ const Profile: React.FC = () => {
               </div>
 
               {/* Website */}
-              <div>
+              {/* <div>
                 <div className="flex items-center space-x-2 mb-2">
                   <Globe className="h-5 w-5 text-gray-400" />
                   <span className="font-medium text-gray-700">Website</span>
@@ -254,10 +254,10 @@ const Profile: React.FC = () => {
                     )}
                   </div>
                 )}
-              </div>
+              </div> */}
 
               {/* Social Links */}
-              <div>
+              {/* <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Social Media</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
@@ -357,7 +357,7 @@ const Profile: React.FC = () => {
                     )}
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

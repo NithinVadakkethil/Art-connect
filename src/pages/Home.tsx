@@ -7,10 +7,10 @@ const Home: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>ArtistHub - Connect Artists with Art Lovers Worldwide</title>
-        <meta name="description" content="Discover unique artworks from talented artists. ArtistHub is the premier platform connecting artists with art enthusiasts globally. Browse, commission, and buy original art." />
+        <title>FrameGlobe - Connect Artists with Art Lovers Worldwide</title>
+        <meta name="description" content="Discover unique artworks from talented artists. FrameGlobe is the premier platform connecting artists with art enthusiasts globally. Browse, commission, and buy original art." />
         <meta name="keywords" content="art, artists, paintings, drawings, artwork, commission, buy art, art gallery, artist platform" />
-        <meta property="og:title" content="ArtistHub - Connect Artists with Art Lovers" />
+        <meta property="og:title" content="FrameGlobe - Connect Artists with Art Lovers" />
         <meta property="og:description" content="Discover unique artworks from talented artists worldwide" />
         <meta property="og:type" content="website" />
       </Helmet>
@@ -57,7 +57,7 @@ const Home: React.FC = () => {
             Empowering Artists, Inspiring Collectors
           </h2>
           <p className="text-xl sm:text-2xl text-gray-600 leading-relaxed max-w-4xl mx-auto">
-            ArtistHub is more than a marketplace—it's a thriving ecosystem where creativity flourishes. 
+            FrameGlobe is more than a marketplace—it's a thriving ecosystem where creativity flourishes. 
             We bridge the gap between visionary artists and passionate collectors, fostering meaningful 
             connections that celebrate the transformative power of art.
           </p>
@@ -240,7 +240,7 @@ const Home: React.FC = () => {
             Ready to Transform Your Art Journey?
           </h2>
           <p className="text-xl sm:text-2xl mb-12 opacity-95 max-w-3xl mx-auto">
-            Join thousands of artists and collectors who are already part of the ArtistHub community. 
+            Join thousands of artists and collectors who are already part of the FrameGlobe community. 
             Your next masterpiece or perfect artwork is just a click away.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
