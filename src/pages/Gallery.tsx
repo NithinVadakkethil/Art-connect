@@ -15,7 +15,30 @@ const Gallery: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showCustomizable, setShowCustomizable] = useState('all');
 
-  const categories = ['all', 'painting', 'drawing', 'digital', 'sculpture', 'photography'];
+  const categories = [
+    // Existing general categories (optional to keep)
+    "All",
+    "painting",
+    "drawing",
+    "digital",
+    "sculpture",
+    "photography",
+    "mixed-media",
+  
+    // Specific categories to add
+    "Graphite pencil portrait",
+    "Charcoal pencil portrait",
+    "Acrylic portrait Painting",
+    "Oil Painting portrait",
+    "Digital portrait",
+    "Watercolor portrait",
+    "Acrylic landscape Painting",
+    "Oil landscape Painting",
+    "Watercolor landscape",
+    "Colour pencil portraits",
+    "Kerala Mural painting",
+    "Ball pen portrait",
+  ];
 
   useEffect(() => {
     fetchArtworks();
@@ -102,7 +125,7 @@ const Gallery: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Art Gallery - ArtistHub</title>
+        <title>Art Gallery - FrameGlobe</title>
         <meta name="description" content="Browse our curated collection of paintings, drawings, digital art, and more from talented artists worldwide." />
         <meta name="keywords" content="art gallery, paintings, drawings, digital art, buy art, commission art" />
       </Helmet>

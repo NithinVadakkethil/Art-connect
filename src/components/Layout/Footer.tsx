@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <Palette className="h-8 w-8 text-indigo-400" />
-              <span className="text-xl font-bold">ArtistHub</span>
+              <span className="text-xl font-bold">FrameGlobe</span>
             </div>
             <p className="text-gray-300 mb-4">
               Connecting talented artists with art enthusiasts worldwide. Discover unique artworks
@@ -68,7 +68,7 @@ const Footer: React.FC = () => {
         
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            © 2024 ArtistHub. All rights reserved. Empowering artists worldwide.
+            © 2024 FrameGlobe. All rights reserved. Empowering artists worldwide.
           </p>
         </div>
       </div>

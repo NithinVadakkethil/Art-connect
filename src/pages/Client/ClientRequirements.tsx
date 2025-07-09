@@ -31,14 +31,30 @@ const ClientRequirements: React.FC = () => {
   });
 
   const categories = [
+    // Existing general categories (optional to keep)
     "painting",
     "drawing",
     "digital",
     "sculpture",
     "photography",
     "mixed-media",
+  
+    // Specific categories to add
+    "Graphite pencil portrait",
+    "Charcoal pencil portrait",
+    "Acrylic portrait Painting",
+    "Oil Painting portrait",
+    "Digital portrait",
+    "Watercolor portrait",
+    "Acrylic landscape Painting",
+    "Oil landscape Painting",
+    "Watercolor landscape",
+    "Colour pencil portraits",
+    "Kerala Mural painting",
+    "Ball pen portrait",
     "other",
   ];
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,7 +189,7 @@ const ClientRequirements: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Submit Art Requirements - ArtistHub</title>
+        <title>Submit Art Requirements - FrameGlobe</title>
         <meta
           name="description"
           content="Tell us about your custom artwork requirements. Our artists can create the perfect piece for you."

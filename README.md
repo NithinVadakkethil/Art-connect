@@ -1,4 +1,4 @@
-# ArtistHub - Complete Artist Showcase Web Application
+# FrameGlobe - Complete Artist Showcase Web Application
 
 A comprehensive web application for artists to showcase their work and connect with clients worldwide. Built with React, TypeScript, Firebase, and Tailwind CSS.
 

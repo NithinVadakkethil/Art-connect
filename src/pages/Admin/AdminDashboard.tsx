@@ -489,10 +489,10 @@
 //   return (
 //     <>
 //       <Helmet>
-//         <title>Admin Dashboard - ArtistHub</title>
+//         <title>Admin Dashboard - FrameGlobe</title>
 //         <meta
 //           name="description"
-//           content="Manage orders, client requirements, and oversee the ArtistHub platform."
+//           content="Manage orders, client requirements, and oversee the FrameGlobe platform."
 //         />
 //       </Helmet>
 
@@ -2198,10 +2198,10 @@ const AdminDashboard: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Admin Dashboard - ArtistHub</title>
+        <title>Admin Dashboard - FrameGlobe</title>
         <meta
           name="description"
-          content="Manage orders, client requirements, and oversee the ArtistHub platform."
+          content="Manage orders, client requirements, and oversee the FrameGlobe platform."
         />
       </Helmet>
 

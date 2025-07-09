@@ -54,7 +54,30 @@ const Dashboard: React.FC = () => {
     file: null as File | null
   });
 
-  const categories = ['painting', 'drawing', 'digital', 'sculpture', 'photography', 'mixed-media'];
+  const categories = [
+    // Existing general categories (optional to keep)
+    "painting",
+    "drawing",
+    "digital",
+    "sculpture",
+    "photography",
+    "mixed-media",
+  
+    // Specific categories to add
+    "Graphite pencil portrait",
+    "Charcoal pencil portrait",
+    "Acrylic portrait Painting",
+    "Oil Painting portrait",
+    "Digital portrait",
+    "Watercolor portrait",
+    "Acrylic landscape Painting",
+    "Oil landscape Painting",
+    "Watercolor landscape",
+    "Colour pencil portraits",
+    "Kerala Mural painting",
+    "Ball pen portrait",
+    "other",
+  ];
 
   useEffect(() => {
     if (currentUser) {
@@ -544,7 +567,7 @@ const Dashboard: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Artist Dashboard - ArtistHub</title>
+        <title>Artist Dashboard - FrameGlobe</title>
         <meta name="description" content="Manage your artworks, view client requirements, and handle orders in your artist dashboard." />
       </Helmet>
 

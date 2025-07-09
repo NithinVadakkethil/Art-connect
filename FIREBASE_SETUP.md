@@ -32,7 +32,7 @@
 1. Go to "Project settings" (gear icon)
 2. Scroll down to "Your apps"
 3. Click "Web" icon (</>) to add web app
-4. Enter app nickname (e.g., "ArtistHub Web")
+4. Enter app nickname (e.g., "FrameGlobe Web")
 5. Don't check "Firebase Hosting" for now
 6. Click "Register app"
 7. Copy the firebaseConfig object

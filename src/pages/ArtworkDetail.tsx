@@ -93,6 +93,28 @@ const ArtworkDetail: React.FC = () => {
         },
       });
 
+      // Send email to Formspree
+      await fetch("https://formspree.io/f/xeokbzrq", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          clientName: orderFormData.clientName,
+          clientEmail: orderFormData.clientEmail,
+          clientPhone: orderFormData.clientPhone,
+          address: orderFormData.address,
+          requirements: orderFormData.requirements,
+          alterationDescription: orderFormData.alterationDescription,
+          artworkTitle: artwork.title,
+          artworkCategory: artwork.category,
+          artworkPrice: artwork.price,
+          artistName: artwork.artistName,
+          message: `New Art Order Submitted\n\nClient: ${orderFormData.clientName}\nEmail: ${orderFormData.clientEmail}\nPhone: ${orderFormData.clientPhone}\n\nArtwork: ${artwork.title} (${artwork.category})\nPrice: ₹${artwork.price}\n\nAddress: ${orderFormData.address}\nRequirements: ${orderFormData.requirements}\nAlteration: ${orderFormData.alterationDescription}\nArtist: ${artwork.artistName}`,
+        }),
+      });
+
       toast.success(
         "Order submitted successfully! Admin will contact you soon."
       );
@@ -101,7 +123,7 @@ const ArtworkDetail: React.FC = () => {
         clientName: currentUser?.displayName || "",
         clientEmail: currentUser?.email || "",
         clientPhone: "",
-        address: '',
+        address: "",
         requirements: "",
         alterationDescription: "",
       });
@@ -138,7 +160,7 @@ const ArtworkDetail: React.FC = () => {
     <>
       <Helmet>
         <title>
-          {artwork.title} by {artwork.artistName} - ArtistHub
+          {artwork.title} by {artwork.artistName} - FrameGlobe
         </title>
         <meta
           name="description"
