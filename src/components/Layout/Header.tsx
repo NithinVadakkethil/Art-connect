@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Palette, User, LogOut, Menu, X, Settings, Briefcase } from 'lucide-react';
+import logo from "../../assets/logo.jpeg"
 
 const Header: React.FC = () => {
   const { currentUser, logout } = useAuth();
@@ -25,7 +26,7 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <Palette className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
+            <img src={logo} className="h-6 w-6 sm:h-8 sm:w-8 text-indigo-600" />
             <span className="text-lg sm:text-xl font-bold text-gray-900">FrameGlobe</span>
           </Link>
 
