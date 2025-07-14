@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import titleLogo from "../assets/logowithtitle.png"
 import { ArrowRight, Palette, Users, Star, Zap, Brush, Heart, Globe, Shield } from 'lucide-react';
 
 const Home: React.FC = () => {
@@ -169,7 +170,8 @@ const Home: React.FC = () => {
             </div>
             <div className="relative">
               <div className="bg-gradient-to-br from-indigo-400 to-purple-500 rounded-2xl h-96 flex items-center justify-center shadow-2xl">
-                <Palette className="h-24 w-24 text-white opacity-80" />
+                {/* <Palette className="h-24 w-24 text-white opacity-80" /> */}
+                <img src={titleLogo} alt="" />
               </div>
             </div>
           </div>

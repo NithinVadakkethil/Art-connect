@@ -41,8 +41,21 @@
 //   MapPinned,
 //   Menu,
 //   ChevronDown,
+//   MessageCircle,
 // } from "lucide-react";
 // import toast from "react-hot-toast";
+
+// // WhatsApp Icon Component
+// const WhatsAppIcon = ({ className = "h-4 w-4" }) => (
+//   <svg
+//     className={className}
+//     viewBox="0 0 24 24"
+//     fill="currentColor"
+//     xmlns="http://www.w3.org/2000/svg"
+//   >
+//     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+//   </svg>
+// );
 
 // const AdminDashboard: React.FC = () => {
 //   const [orders, setOrders] = useState<Order[]>([]);
@@ -77,7 +90,9 @@
 //   // Mobile states
 //   const [showMobileFilters, setShowMobileFilters] = useState(false);
 //   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
-//   const [expandedRequirementId, setExpandedRequirementId] = useState<string | null>(null);
+//   const [expandedRequirementId, setExpandedRequirementId] = useState<
+//     string | null
+//   >(null);
 
 //   useEffect(() => {
 //     fetchData();
@@ -429,6 +444,110 @@
 //     }
 //   };
 
+//   // WhatsApp sharing function for declined orders
+//   const shareOrderToWhatsApp = (order: Order) => {
+//     const message = `🎨 *DECLINED ORDER - NEED NEW ARTIST*
+
+// 📋 *Order Details:*
+// • Artwork: ${order.artwork.title}
+// • Category: ${order.artwork.category}
+// • Artist: ${order.artistName} (DECLINED)
+// • Client: ${order.clientName}
+
+// 💰 *Price:* ₹${order.artwork.price || "Not specified"}
+
+// 📍 *Address:*
+// ${order.address}
+
+// ❌ *Decline Reason:*
+// ${order.declineReason || "No reason provided"}
+
+// ${
+//   order.requirements
+//     ? `📝 *Special Requirements:*
+// ${order.requirements}
+
+// `
+//     : ""
+// }${
+//       order.alterationDescription
+//         ? `🎨 *Customization Request:*
+// ${order.alterationDescription}
+
+// `
+//         : ""
+//     }🔍 *Looking for a new artist to take this order!*
+
+// #DeclinedOrder #NeedArtist #FrameGlobe`;
+
+//     const encodedMessage = encodeURIComponent(message);
+//     const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+
+//     window.open(whatsappUrl, "_blank");
+//     toast.success("Order details shared to WhatsApp!");
+//   };
+
+//   // WhatsApp sharing function for client requirements
+//   const shareRequirementToWhatsApp = (requirement: ClientRequirement) => {
+//     const message = `🎨 *CLIENT REQUIREMENT - NEED ARTIST*
+
+// 📋 *Requirement Details:*
+// • ID: #${requirement.id.slice(-6)}
+// • Client: ${requirement.clientName}
+// ${requirement.address ? `📍 *Address:* ${requirement.address}` : ""}
+
+// ${requirement.category ? `🎯 *Category:* ${requirement.category}` : ""}
+// ${requirement.budget ? `💰 *Budget:* ₹${requirement.budget}` : ""}
+// ${
+//   requirement.deadline
+//     ? `⏰ *Deadline:* ${new Date(
+//         requirement.deadline.seconds * 1000
+//       ).toLocaleDateString()}`
+//     : ""
+// }
+
+// 📝 *Description:*
+// ${requirement.description}
+
+// 📊 *Status:* ${
+//       requirement.status.charAt(0).toUpperCase() + requirement.status.slice(1)
+//     }
+
+// ${
+//   requirement.sharedWith && requirement.sharedWith.length > 0
+//     ? `👥 *Shared with ${requirement.sharedWith.length} artist(s)
+// `
+//     : ""
+// }
+// ${
+//   requirement.acceptedBy
+//     ? `✅ *Accepted by:* ${requirement.acceptedBy.artistName}
+// `
+//     : ""
+// }
+// ${
+//   requirement.workCompleted
+//     ? `🎉 *Work Completed by:* ${requirement.workCompleted.artistName}
+// `
+//     : ""
+// }
+// ${
+//   requirement.attachmentUrl
+//     ? `📎 *Reference Image: ${requirement.attachmentUrl}
+// `
+//     : ""
+// }
+// 🔍 *Looking for an artist to fulfill this requirement!*
+
+// #ClientRequirement #NeedArtist #FrameGlobe`;
+
+//     const encodedMessage = encodeURIComponent(message);
+//     const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+
+//     window.open(whatsappUrl, "_blank");
+//     toast.success("Requirement details shared to WhatsApp!");
+//   };
+
 //   const getStatusColor = (status: string) => {
 //     switch (status) {
 //       case "pending":
@@ -609,7 +728,11 @@
 //                           Filter Orders
 //                         </span>
 //                       </div>
-//                       <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform ${showMobileFilters ? 'rotate-180' : ''}`} />
+//                       <ChevronDown
+//                         className={`h-5 w-5 text-gray-400 transition-transform ${
+//                           showMobileFilters ? "rotate-180" : ""
+//                         }`}
+//                       />
 //                     </button>
 //                   </div>
 
@@ -719,6 +842,12 @@
 //                                   ₹{order.artwork.price}
 //                                 </p>
 //                               )}
+//                               {order.status === "cancelled" &&
+//                                 order.declineReason && (
+//                                   <p className="text-xs text-red-600 mt-1 line-clamp-2">
+//                                     Declined: {order.declineReason}
+//                                   </p>
+//                                 )}
 //                             </div>
 //                           </div>
 
@@ -740,7 +869,21 @@
 //                                   className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 transition-colors flex items-center space-x-1"
 //                                 >
 //                                   <Send className="h-3 w-3" />
-//                                   <span className="hidden sm:inline">Share</span>
+//                                   <span className="hidden sm:inline">
+//                                     Share
+//                                   </span>
+//                                 </button>
+//                               )}
+//                               {order.status === "cancelled" && (
+//                                 <button
+//                                   onClick={() => shareOrderToWhatsApp(order)}
+//                                   className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors flex items-center space-x-1"
+//                                   title="Share to WhatsApp Group"
+//                                 >
+//                                   <WhatsAppIcon className="h-3 w-3" />
+//                                   <span className="hidden sm:inline">
+//                                     WhatsApp
+//                                   </span>
 //                                 </button>
 //                               )}
 //                               <button
@@ -785,7 +928,11 @@
 //                           Filter Requirements
 //                         </span>
 //                       </div>
-//                       <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform ${showMobileFilters ? 'rotate-180' : ''}`} />
+//                       <ChevronDown
+//                         className={`h-5 w-5 text-gray-400 transition-transform ${
+//                           showMobileFilters ? "rotate-180" : ""
+//                         }`}
+//                       />
 //                     </button>
 //                   </div>
 
@@ -890,8 +1037,9 @@
 //                                   <span className="text-xs text-blue-600 font-medium">
 //                                     Shared with:
 //                                   </span>
-//                                   {requirement.sharedWith.slice(0, 3).map(
-//                                     (artistId, index) => {
+//                                   {requirement.sharedWith
+//                                     .slice(0, 3)
+//                                     .map((artistId, index) => {
 //                                       const artist = artists.find(
 //                                         (a) => a.uid === artistId
 //                                       );
@@ -913,14 +1061,13 @@
 //                                               : "bg-blue-100 text-blue-800"
 //                                           }`}
 //                                         >
-//                                           {artist?.displayName?.split(' ')[0] ||
+//                                           {artist?.displayName?.split(" ")[0] ||
 //                                             "Unknown"}
 //                                           {isAccepted && " ✓"}
 //                                           {isDeclined && " ✗"}
 //                                         </span>
 //                                       );
-//                                     }
-//                                   )}
+//                                     })}
 //                                   {requirement.sharedWith.length > 3 && (
 //                                     <span className="text-xs text-gray-500">
 //                                       +{requirement.sharedWith.length - 3} more
@@ -950,7 +1097,9 @@
 //                                     className="bg-purple-600 text-white px-2 py-1 rounded text-xs hover:bg-purple-700 transition-colors flex items-center space-x-1"
 //                                   >
 //                                     <Users className="h-3 w-3" />
-//                                     <span className="hidden sm:inline">Share All</span>
+//                                     <span className="hidden sm:inline">
+//                                       Share All
+//                                     </span>
 //                                   </button>
 //                                   <button
 //                                     onClick={() => {
@@ -960,10 +1109,24 @@
 //                                     className="bg-indigo-600 text-white px-2 py-1 rounded text-xs hover:bg-indigo-700 transition-colors flex items-center space-x-1"
 //                                   >
 //                                     <Share2 className="h-3 w-3" />
-//                                     <span className="hidden sm:inline">Share</span>
+//                                     <span className="hidden sm:inline">
+//                                       Share
+//                                     </span>
 //                                   </button>
 //                                 </>
 //                               )}
+//                               <button
+//                                 onClick={() =>
+//                                   shareRequirementToWhatsApp(requirement)
+//                                 }
+//                                 className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors flex items-center space-x-1"
+//                                 title="Share to WhatsApp Group"
+//                               >
+//                                 <WhatsAppIcon className="h-3 w-3" />
+//                                 <span className="hidden sm:inline">
+//                                   WhatsApp
+//                                 </span>
+//                               </button>
 //                               <button
 //                                 onClick={() => {
 //                                   setSelectedRequirement(requirement);
@@ -975,7 +1138,9 @@
 //                                 <span className="hidden sm:inline">View</span>
 //                               </button>
 //                               <button
-//                                 onClick={() => deleteRequirement(requirement.id)}
+//                                 onClick={() =>
+//                                   deleteRequirement(requirement.id)
+//                                 }
 //                                 className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors flex items-center space-x-1"
 //                               >
 //                                 <Trash2 className="h-3 w-3" />
@@ -1026,6 +1191,16 @@
 //                     Order Details
 //                   </h2>
 //                   <div className="flex items-center space-x-2">
+//                     {selectedOrder.status === "cancelled" && (
+//                       <button
+//                         onClick={() => shareOrderToWhatsApp(selectedOrder)}
+//                         className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 text-sm"
+//                         title="Share to WhatsApp Group"
+//                       >
+//                         <WhatsAppIcon className="h-4 w-4" />
+//                         <span>Share to WhatsApp</span>
+//                       </button>
+//                     )}
 //                     <button
 //                       onClick={() => deleteOrder(selectedOrder.id)}
 //                       className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2 text-sm"
@@ -1123,7 +1298,9 @@
 //                         <div className="space-y-2 text-sm">
 //                           <div className="flex items-center space-x-2">
 //                             <UserIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
-//                             <span className="break-all">{selectedOrder.clientName}</span>
+//                             <span className="break-all">
+//                               {selectedOrder.clientName}
+//                             </span>
 //                           </div>
 //                           <div className="flex items-center space-x-2">
 //                             <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
@@ -1145,7 +1322,9 @@
 //                           </div>
 //                           <div className="flex items-start space-x-2">
 //                             <MapPinned className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
-//                             <span className="break-words">{selectedOrder.address}</span>
+//                             <span className="break-words">
+//                               {selectedOrder.address}
+//                             </span>
 //                           </div>
 //                         </div>
 //                       </div>
@@ -1162,7 +1341,9 @@
 //                             <div className="space-y-2 text-sm">
 //                               <div className="flex items-center space-x-2">
 //                                 <UserIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
-//                                 <span className="break-all">{artistContact.displayName}</span>
+//                                 <span className="break-all">
+//                                   {artistContact.displayName}
+//                                 </span>
 //                               </div>
 //                               <div className="flex items-center space-x-2">
 //                                 <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
@@ -1225,6 +1406,12 @@
 //                             {formatTimestamp(selectedOrder.completedAt)}
 //                           </p>
 //                         )}
+//                         {selectedOrder.cancelledAt && (
+//                           <p>
+//                             <span className="font-medium">Cancelled:</span>{" "}
+//                             {formatTimestamp(selectedOrder.cancelledAt)}
+//                           </p>
+//                         )}
 //                       </div>
 //                     </div>
 
@@ -1284,6 +1471,16 @@
 //                   </h2>
 //                   <div className="flex items-center space-x-2">
 //                     <button
+//                       onClick={() =>
+//                         shareRequirementToWhatsApp(selectedRequirement)
+//                       }
+//                       className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 text-sm"
+//                       title="Share to WhatsApp Group"
+//                     >
+//                       <WhatsAppIcon className="h-4 w-4" />
+//                       <span>Share to WhatsApp</span>
+//                     </button>
+//                     <button
 //                       onClick={() => deleteRequirement(selectedRequirement.id)}
 //                       className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2 text-sm"
 //                     >
@@ -1340,7 +1537,9 @@
 //                       <div className="space-y-2 text-sm">
 //                         <div className="flex items-center space-x-2">
 //                           <UserIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
-//                           <span className="break-all">{selectedRequirement.clientName}</span>
+//                           <span className="break-all">
+//                             {selectedRequirement.clientName}
+//                           </span>
 //                         </div>
 //                         <div className="flex items-center space-x-2">
 //                           <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
@@ -1583,7 +1782,7 @@
 
 //               <div className="mb-4">
 //                 <label className="block text-sm font-medium text-gray-700 mb-2">
-//                   Proposed Price ($) *
+//                   Proposed Price (₹) *
 //                 </label>
 //                 <input
 //                   type="number"
@@ -1671,7 +1870,9 @@
 //                       <p className="font-medium text-gray-900 truncate">
 //                         {artist.displayName}
 //                       </p>
-//                       <p className="text-sm text-gray-600 truncate">{artist.email}</p>
+//                       <p className="text-sm text-gray-600 truncate">
+//                         {artist.email}
+//                       </p>
 //                     </div>
 //                   </label>
 //                 ))}
@@ -1720,7 +1921,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
-import { Order, ClientRequirement, User } from "../types";
+import { Order, ClientRequirement, User, SharedRequirement } from "../types";
 import { Helmet } from "react-helmet-async";
 import {
   Users,
@@ -1769,6 +1970,7 @@ const WhatsAppIcon = ({ className = "h-4 w-4" }) => (
 const AdminDashboard: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [requirements, setRequirements] = useState<ClientRequirement[]>([]);
+  const [sharedRequirements, setSharedRequirements] = useState<SharedRequirement[]>([]);
   const [artists, setArtists] = useState<User[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [filteredRequirements, setFilteredRequirements] = useState<
@@ -1839,6 +2041,17 @@ const AdminDashboard: React.FC = () => {
         ...doc.data(),
       })) as ClientRequirement[];
 
+      // Fetch shared requirements to get artist responses
+      const sharedRequirementsQuery = query(
+        collection(db, "sharedRequirements"),
+        orderBy("sharedAt", "desc")
+      );
+      const sharedRequirementsSnapshot = await getDocs(sharedRequirementsQuery);
+      const sharedRequirementsList = sharedRequirementsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as SharedRequirement[];
+
       // Fetch artists
       const artistsQuery = query(
         collection(db, "users"),
@@ -1852,6 +2065,7 @@ const AdminDashboard: React.FC = () => {
 
       setOrders(ordersList);
       setRequirements(requirementsList);
+      setSharedRequirements(sharedRequirementsList);
       setArtists(artistsList);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -1910,6 +2124,22 @@ const AdminDashboard: React.FC = () => {
     }
 
     setFilteredRequirements(filtered);
+  };
+
+  // Helper function to get artist response status for a requirement
+  const getArtistResponseStatus = (requirementId: string, artistId: string) => {
+    const sharedReq = sharedRequirements.find(
+      (sr) => sr.requirementId === requirementId && sr.artistId === artistId
+    );
+    return sharedReq?.status || 'pending';
+  };
+
+  // Helper function to get decline reason for an artist
+  const getArtistDeclineReason = (requirementId: string, artistId: string) => {
+    const sharedReq = sharedRequirements.find(
+      (sr) => sr.requirementId === requirementId && sr.artistId === artistId
+    );
+    return sharedReq?.declineReason || null;
   };
 
   const updateOrderStatus = async (
@@ -2045,6 +2275,9 @@ const AdminDashboard: React.FC = () => {
       setShowShareAllModal(false);
       setSelectedRequirement(null);
       setProposedPrice("");
+      
+      // Refresh shared requirements data
+      fetchData();
     } catch (error) {
       console.error("Error sharing requirement to all artists:", error);
       toast.error("Failed to share requirement to all artists");
@@ -2107,6 +2340,9 @@ const AdminDashboard: React.FC = () => {
       setSelectedRequirement(null);
       setSelectedArtists([]);
       setProposedPrice("");
+      
+      // Refresh shared requirements data
+      fetchData();
     } catch (error) {
       console.error("Error sharing requirement:", error);
       toast.error("Failed to share requirement");
@@ -2245,8 +2481,7 @@ ${
     ? `📎 *Reference Image: ${requirement.attachmentUrl}
 `
     : ""
-}
-🔍 *Looking for an artist to fulfill this requirement!*
+}🔍 *Looking for an artist to fulfill this requirement!*
 
 #ClientRequirement #NeedArtist #FrameGlobe`;
 
@@ -2272,6 +2507,10 @@ ${
       case "completed":
         return "bg-green-100 text-green-800";
       case "cancelled":
+        return "bg-red-100 text-red-800";
+      case "accepted":
+        return "bg-green-100 text-green-800";
+      case "declined":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -2752,12 +2991,10 @@ ${
                                       const artist = artists.find(
                                         (a) => a.uid === artistId
                                       );
-                                      const isAccepted =
-                                        requirement.acceptedBy?.artistId ===
-                                        artistId;
-                                      const isDeclined =
-                                        requirement.status === "assigned" &&
-                                        !isAccepted;
+                                      const artistStatus = getArtistResponseStatus(requirement.id, artistId);
+                                      const isAccepted = artistStatus === 'accepted';
+                                      const isDeclined = artistStatus === 'declined';
+                                      const declineReason = getArtistDeclineReason(requirement.id, artistId);
 
                                       return (
                                         <span
@@ -2769,6 +3006,7 @@ ${
                                               ? "bg-red-100 text-red-800"
                                               : "bg-blue-100 text-blue-800"
                                           }`}
+                                          title={isDeclined && declineReason ? `Declined: ${declineReason}` : ''}
                                         >
                                           {artist?.displayName?.split(" ")[0] ||
                                             "Unknown"}
@@ -3347,36 +3585,52 @@ ${
                       selectedRequirement.sharedWith.length > 0 && (
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">
-                            Shared Artists
+                            Artist Responses
                           </h4>
-                          <div className="space-y-1">
+                          <div className="space-y-2">
                             {selectedRequirement.sharedWith.map(
-                              (artistId, index) => {
+                              (artistId) => {
                                 const artist = artists.find(
                                   (a) => a.uid === artistId
                                 );
-                                const isAccepted =
-                                  selectedRequirement.acceptedBy?.artistId ===
-                                  artistId;
-                                const isDeclined =
-                                  selectedRequirement.status === "assigned" &&
-                                  !isAccepted;
+                                const artistStatus = getArtistResponseStatus(selectedRequirement.id, artistId);
+                                const declineReason = getArtistDeclineReason(selectedRequirement.id, artistId);
+                                const isAccepted = artistStatus === 'accepted';
+                                const isDeclined = artistStatus === 'declined';
 
                                 return (
-                                  <span
+                                  <div
                                     key={artistId}
-                                    className={`inline-block px-2 py-1 rounded text-xs mr-1 mb-1 ${
+                                    className={`p-3 rounded-lg border ${
                                       isAccepted
-                                        ? "bg-green-100 text-green-800"
+                                        ? "bg-green-50 border-green-200"
                                         : isDeclined
-                                        ? "bg-red-100 text-red-800"
-                                        : "bg-blue-100 text-blue-800"
+                                        ? "bg-red-50 border-red-200"
+                                        : "bg-blue-50 border-blue-200"
                                     }`}
                                   >
-                                    {artist?.displayName || "Unknown Artist"}
-                                    {isAccepted && " ✓ Accepted"}
-                                    {isDeclined && " ✗ Declined"}
-                                  </span>
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-medium text-sm">
+                                        {artist?.displayName || "Unknown Artist"}
+                                      </span>
+                                      <span
+                                        className={`px-2 py-1 rounded text-xs ${
+                                          isAccepted
+                                            ? "bg-green-100 text-green-800"
+                                            : isDeclined
+                                            ? "bg-red-100 text-red-800"
+                                            : "bg-blue-100 text-blue-800"
+                                        }`}
+                                      >
+                                        {artistStatus.charAt(0).toUpperCase() + artistStatus.slice(1)}
+                                      </span>
+                                    </div>
+                                    {isDeclined && declineReason && (
+                                      <p className="text-xs text-red-600 mt-1">
+                                        Reason: {declineReason}
+                                      </p>
+                                    )}
+                                  </div>
                                 );
                               }
                             )}
