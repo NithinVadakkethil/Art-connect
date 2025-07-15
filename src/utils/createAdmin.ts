@@ -6,9 +6,9 @@ import { auth, db } from '../config/firebase';
 export const createAdminUser = async () => {
   try {
     // Create admin user with email and password
-    const adminEmail = 'admin@artisthub.com';
-    const adminPassword = 'Admin123!'; // Change this to a secure password
-    const adminName = 'Admin User';
+    const adminEmail = 'admin@frameGlobe.com';
+    const adminPassword = 'adminadmin123#'; // Change this to a secure password
+    const adminName = 'Admin';
 
     const { user } = await createUserWithEmailAndPassword(auth, adminEmail, adminPassword);
     

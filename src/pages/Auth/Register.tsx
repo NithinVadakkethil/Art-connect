@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Helmet } from "react-helmet-async";
 import { Eye, EyeOff, Palette, User, Users, Phone } from "lucide-react";
+import logo from "../../assets/logo.png"
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -99,7 +100,12 @@ const Register: React.FC = () => {
         <div className="max-w-md w-full space-y-8">
           <div>
             <div className="flex justify-center">
-              <Palette className="h-12 w-12 text-indigo-600" />
+              {/* <Palette className="h-12 w-12 text-indigo-600" /> */}
+              <img 
+              src={logo} 
+              alt="FrameGlobe Logo"
+              className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 object-contain" 
+            />
             </div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
               Create your account

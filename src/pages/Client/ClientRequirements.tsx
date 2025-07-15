@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import FileUpload from "../../components/FileUpload";
 import toast from "react-hot-toast";
+import logo from "../../assets/logo.png";
 
 const ClientRequirements: React.FC = () => {
   const { currentUser } = useAuth();
@@ -38,7 +39,7 @@ const ClientRequirements: React.FC = () => {
     "sculpture",
     "photography",
     "mixed-media",
-  
+
     // Specific categories to add
     "Graphite pencil portrait",
     "Charcoal pencil portrait",
@@ -54,7 +55,6 @@ const ClientRequirements: React.FC = () => {
     "Ball pen portrait",
     "other",
   ];
-  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +78,7 @@ const ClientRequirements: React.FC = () => {
       // Upload attachment if provided
       if (formData.attachment) {
         setUploadProgress(true);
-        const CLOUD_NAME = "dlsgpthqy";
+        const CLOUD_NAME = "dn2i2gk5y";
         const UPLOAD_PRESET = "artist_upload_preset";
         const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
@@ -398,7 +398,12 @@ const ClientRequirements: React.FC = () => {
               <div className="bg-gray-50 p-6 rounded-lg">
                 <div className="flex items-start space-x-3 mb-4">
                   <div className="flex-shrink-0">
-                    <Palette className="h-6 w-6 text-indigo-600" />
+                    {/* <Palette className="h-6 w-6 text-indigo-600" /> */}
+                    <img
+                      src={logo}
+                      alt="FrameGlobe Logo"
+                      className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 object-contain"
+                    />
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-900">

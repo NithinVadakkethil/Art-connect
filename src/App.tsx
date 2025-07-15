@@ -64,7 +64,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               
               {/* Admin Setup Route */}
-              <Route path="/setup-admin" element={<AdminSetup />} />
+              {/* <Route path="/setup-admin" element={<AdminSetup />} /> */}
             </Routes>
           </div>
         </Router>
