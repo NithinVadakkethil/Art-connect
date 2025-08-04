@@ -22,8 +22,41 @@
 //     setError('');
     
 //     try {
-//       await login(email, password);
-//       navigate('/');
+//       const user = await login(email, password);
+      
+//       // Role-based navigation
+//       if (user.role === 'admin') {
+//         navigate('/admin');
+//       } else if (user.role === 'artist') {
+//         navigate('/dashboard');
+//       } else if (user.role === 'client') {
+//         navigate('/requirements');
+//       } else {
+//         // Fallback to home for any other role
+//         navigate('/');
+//       }
+//       // Role-based navigation
+//       if (user.role === 'admin') {
+//         navigate('/admin');
+//       } else if (user.role === 'artist') {
+//         navigate('/dashboard');
+//       } else if (user.role === 'client') {
+//         navigate('/requirements');
+//       } else {
+//         // Fallback to home for any other role
+//         navigate('/');
+//       }
+//       // Role-based navigation
+//       if (user.role === 'admin') {
+//         navigate('/admin');
+//       } else if (user.role === 'artist') {
+//         navigate('/dashboard');
+//       } else if (user.role === 'client') {
+//         navigate('/requirements');
+//       } else {
+//         // Fallback to home for any other role
+//         navigate('/');
+//       }
 //     } catch (error: any) {
 //       console.error('Login error:', error);
       
@@ -230,28 +263,6 @@ const Login: React.FC = () => {
         // Fallback to home for any other role
         navigate('/');
       }
-      // Role-based navigation
-      if (user.role === 'admin') {
-        navigate('/admin');
-      } else if (user.role === 'artist') {
-        navigate('/dashboard');
-      } else if (user.role === 'client') {
-        navigate('/requirements');
-      } else {
-        // Fallback to home for any other role
-        navigate('/');
-      }
-      // Role-based navigation
-      if (user.role === 'admin') {
-        navigate('/admin');
-      } else if (user.role === 'artist') {
-        navigate('/dashboard');
-      } else if (user.role === 'client') {
-        navigate('/requirements');
-      } else {
-        // Fallback to home for any other role
-        navigate('/');
-      }
     } catch (error: any) {
       console.error('Login error:', error);
       
@@ -327,35 +338,6 @@ const Login: React.FC = () => {
             </div>
           )}
 
-          {/* Admin Login Info */}
-          {/* <div className="rounded-md bg-blue-50 p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <Info className="h-5 w-5 text-blue-400" />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">
-                  Admin Access
-                </h3>
-                <div className="mt-2 text-sm text-blue-700">
-                  <p>
-                    For admin access, use: <strong>admin@artisthub.com</strong>
-                  </p>
-                  <p className="mt-1">
-                    If the admin account doesn't exist, visit{' '}
-                    <Link 
-                      to="/setup-admin" 
-                      className="font-medium underline hover:no-underline"
-                    >
-                      /setup-admin
-                    </Link>{' '}
-                    to create it.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div> */}
-
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
@@ -400,6 +382,17 @@ const Login: React.FC = () => {
                     <Eye className="h-4 w-4 text-gray-400" />
                   )}
                 </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="text-sm">
+                <Link
+                  to="/forgot-password"
+                  className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
+                >
+                  Forgot your password?
+                </Link>
               </div>
             </div>
 

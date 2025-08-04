@@ -15,6 +15,7 @@ import Dashboard from './pages/Artist/Dashboard';
 import Profile from './pages/Artist/Profile';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import ClientRequirements from './pages/Client/ClientRequirements';
+import ForgotPassword from './pages/Auth/ForgotPassword';
 
 function App() {
   return (
@@ -64,7 +65,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               
               {/* Admin Setup Route */}
-              {/* <Route path="/setup-admin" element={<AdminSetup />} /> */}
+              <Route path="/forgot-password" element={<ForgotPassword />} />
             </Routes>
           </div>
         </Router>
