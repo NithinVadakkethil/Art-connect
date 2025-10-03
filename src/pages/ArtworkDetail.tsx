@@ -15,6 +15,7 @@ import {
   MessageSquare,
   Edit,
 } from "lucide-react";
+import { sendDiscordNotification } from "../utils/discord";
 import toast from "react-hot-toast";
 
 const ArtworkDetail: React.FC = () => {
@@ -71,7 +72,7 @@ const ArtworkDetail: React.FC = () => {
     }
 
     try {
-      await addDoc(collection(db, "orders"), {
+      const orderData = {
         artworkId: artwork.id,
         artistId: artwork.artistId,
         artistName: artwork.artistName,
@@ -91,6 +92,21 @@ const ArtworkDetail: React.FC = () => {
           category: artwork.category,
           isCustomizable: artwork.isCustomizable,
         },
+      };
+
+      const newOrderRef = await addDoc(collection(db, "orders"), orderData);
+
+      // Send Discord notification
+      await sendDiscordNotification({
+        title: 'New Artwork Order',
+        color: 0x00ffff, // Cyan
+        fields: [
+          { name: 'Artwork', value: artwork.title, inline: true },
+          { name: 'Artist', value: artwork.artistName, inline: true },
+          { name: 'Client', value: orderFormData.clientName, inline: true },
+          { name: 'Price', value: artwork.price ? `₹${artwork.price}` : 'N/A', inline: true },
+        ],
+        footer: { text: `Order ID: ${newOrderRef.id}` },
       });
 
       // Send email to Formspree

@@ -162,22 +162,23 @@ import {
   EmailAuthProvider,
   sendPasswordResetEmail
 } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, query, collection, where, getDocs, updateDoc, arrayUnion } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
+import { sendDiscordNotification } from '../utils/discord';
 
 interface UserData {
   uid: string;
   email: string;
-  displayName: string;
-  role: 'artist' | 'client' | 'admin';
+  displayName:string;
+  role: 'artist' | 'client' | 'admin' | 'affiliate';
   phone?: string;
   createdAt: Date;
 }
 
 interface AuthContextType {
   currentUser: UserData | null;
-  login: (email: string, password: string) => Promise<UserData>;
-  register: (email: string, password: string, name: string, role: string, phone: string) => Promise<UserData>;
+  login: (email: string, password:string) => Promise<UserData>;
+  register: (email: string, password: string, name: string, role: string, phone: string, referralCode?: string) => Promise<UserData>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
@@ -203,7 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           uid: user.uid,
           email: user.email!,
           displayName: userData.displayName || user.displayName || '',
-          role: userData.role || 'artist',
+          role: userData.role || 'client',
           phone: userData.phone || '',
           createdAt: userData.createdAt?.toDate() || new Date(),
         };
@@ -237,28 +238,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     password: string, 
     name: string, 
     role: string, 
-    phone: string
+    phone: string,
+    referralCode?: string
   ): Promise<UserData> => {
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       
-      const userData: UserData = {
-        uid: result.user.uid,
-        email: result.user.email!,
-        displayName: name,
-        role: role as 'artist' | 'client' | 'admin',
-        phone,
-        createdAt: new Date(),
-      };
-
-      // Save user data to Firestore
-      await setDoc(doc(db, 'users', result.user.uid), {
+      const userDocData: any = {
         displayName: name,
         email: result.user.email,
         role,
         phone,
         createdAt: new Date(),
         uid: result.user.uid,
+      };
+
+      if (referralCode) {
+        const affiliatesQuery = query(collection(db, 'affiliates'), where('referralCode', '==', referralCode));
+        const affiliateSnapshot = await getDocs(affiliatesQuery);
+        if (!affiliateSnapshot.empty) {
+          const affiliateDoc = affiliateSnapshot.docs[0];
+          userDocData.referredBy = affiliateDoc.id;
+
+          const affiliateRef = doc(db, 'affiliates', affiliateDoc.id);
+          await updateDoc(affiliateRef, {
+            referredUsers: arrayUnion(result.user.uid)
+          });
+        }
+      }
+
+      const userData: UserData = {
+        uid: result.user.uid,
+        email: result.user.email!,
+        displayName: name,
+        role: role as 'artist' | 'client' | 'admin' | 'affiliate',
+        phone,
+        createdAt: new Date(),
+      };
+
+      // Save user data to Firestore
+      await setDoc(doc(db, 'users', result.user.uid), userDocData);
+
+      if (role === 'affiliate') {
+        const newReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+        await setDoc(doc(db, 'affiliates', result.user.uid), {
+          uid: result.user.uid,
+          name,
+          email: result.user.email,
+          referralCode: newReferralCode,
+          referredUsers: [],
+          createdAt: new Date(),
+        });
+      }
+
+      // Send Discord notification
+      await sendDiscordNotification({
+        title: 'New User Registration',
+        description: `A new ${role} has signed up!`,
+        color: 0x00ff00, // Green
+        fields: [
+          { name: 'Name', value: name, inline: true },
+          { name: 'Email', value: email, inline: true },
+          { name: 'Role', value: role, inline: true },
+        ],
       });
 
       setCurrentUser(userData);

@@ -6,6 +6,7 @@ export interface User {
   phone?: string; // Added phone field
   role: 'artist' | 'client' | 'admin';
   createdAt: Date;
+  referredBy?: string;
 }
 
 export interface Artist extends User {
@@ -52,6 +53,7 @@ export interface Order {
   alterationDescription?: string;
   status: 'pending' | 'shared' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled';
   orderDate: any;
+  paymentStatus: 'unpaid' | 'paid';
   sharedAt?: any;
   confirmedAt?: any;
   inProgressAt?: any;
@@ -140,4 +142,22 @@ export interface SharedOrder {
       isCustomizable: boolean;
     };
   };
+}
+
+export interface Affiliate {
+  uid: string;
+  name: string;
+  email: string;
+  referralCode: string;
+  referredUsers: string[]; // Array of user IDs
+  createdAt: Date;
+}
+
+export interface Achievement {
+  id: string;
+  userId: string; // The user who earned the achievement
+  type: 'referral_signup' | 'referral_first_sale';
+  message: string;
+  achievedAt: Date;
+  relatedUserId?: string; // The user who was referred
 }

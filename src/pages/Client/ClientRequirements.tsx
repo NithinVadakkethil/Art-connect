@@ -11,6 +11,7 @@ import {
   Calendar,
   Tag,
 } from "lucide-react";
+import { sendDiscordNotification } from "../../utils/discord";
 import FileUpload from "../../components/FileUpload";
 import toast from "react-hot-toast";
 import logo from "../../assets/logo.png";
@@ -133,7 +134,20 @@ const ClientRequirements: React.FC = () => {
         createdAt: new Date(),
       };
 
-      await addDoc(collection(db, "requirements"), requirementData);
+      const newReqRef = await addDoc(collection(db, "requirements"), requirementData);
+
+      // Send Discord notification
+      await sendDiscordNotification({
+        title: 'New Client Requirement Submitted',
+        color: 0xffa500, // Orange
+        fields: [
+          { name: 'Client Name', value: requirementData.clientName, inline: true },
+          { name: 'Category', value: requirementData.category || 'N/A', inline: true },
+          { name: 'Budget', value: requirementData.budget ? `₹${requirementData.budget}` : 'N/A', inline: true },
+          { name: 'Description', value: requirementData.description.substring(0, 1024) },
+        ],
+        footer: { text: `Requirement ID: ${newReqRef.id}` },
+      });
 
       toast.success(
         "Your requirement has been submitted successfully! Our admin will contact you soon."

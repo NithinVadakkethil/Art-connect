@@ -1552,6 +1552,7 @@ import { Artwork, SharedRequirement, SharedOrder } from '../types';
 import { Helmet } from 'react-helmet-async';
 import { Plus, Upload, Edit, Trash2, Eye, Check, X, Clock, IndianRupee, User, Calendar, MessageSquare, Palette, Search, Filter, ZoomIn, UserCheck, AlertCircle, Lock, CheckCircle, Share, MessageCircle } from 'lucide-react';
 import { compressImage, createThumbnail } from '../../utils/imageOptimization';
+import { sendDiscordNotification } from '../../utils/discord';
 import FileUpload from '../../components/FileUpload';
 import toast from 'react-hot-toast';
 
@@ -1918,8 +1919,20 @@ const Dashboard: React.FC = () => {
         isAvailable: true
       };
 
-      await addDoc(collection(db, 'artworks'), artworkData);
+      const newArtworkRef = await addDoc(collection(db, 'artworks'), artworkData);
       
+      // Send Discord notification
+      await sendDiscordNotification({
+        title: 'New Artwork Uploaded',
+        description: `**${artworkData.title}** by ${artworkData.artistName}`,
+        color: 0x0000ff, // Blue
+        fields: [
+          { name: 'Category', value: artworkData.category, inline: true },
+          { name: 'Price', value: artworkData.price ? `₹${artworkData.price}` : 'N/A', inline: true },
+        ],
+        footer: { text: `Artwork ID: ${newArtworkRef.id}` },
+      });
+
       toast.success('Artwork uploaded successfully!');
       setShowUploadModal(false);
       setUploadFormData({

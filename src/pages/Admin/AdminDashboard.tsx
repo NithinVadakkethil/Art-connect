@@ -1953,6 +1953,7 @@ import {
   ChevronDown,
   MessageCircle,
 } from "lucide-react";
+import { sendDiscordNotification } from "../../utils/discord";
 import toast from "react-hot-toast";
 
 // WhatsApp Icon Component
@@ -2157,6 +2158,21 @@ const AdminDashboard: React.FC = () => {
         status,
         [`${status}At`]: new Date(),
       });
+
+      const updatedOrder = orders.find(order => order.id === orderId);
+      if (updatedOrder) {
+        await sendDiscordNotification({
+          title: 'Order Status Updated',
+          color: 0xffff00, // Yellow
+          fields: [
+            { name: 'Artwork', value: updatedOrder.artwork.title, inline: true },
+            { name: 'New Status', value: status, inline: true },
+            { name: 'Client', value: updatedOrder.clientName, inline: true },
+          ],
+          footer: { text: `Order ID: ${orderId}` },
+        });
+      }
+
       setOrders(
         orders.map((order) =>
           order.id === orderId ? { ...order, status } : order

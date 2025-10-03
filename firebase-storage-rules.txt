@@ -1,24 +1,23 @@
-// Firebase Storage Security Rules
-// Copy these rules to your Firebase Console -> Storage -> Rules
-
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Allow authenticated users to upload artworks
-    match /artworks/{userId}/{allPaths=**} {
+
+    // Thumbnails are public for gallery browsing
+    match /thumbnails/{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null; // Artists can write their own thumbnails
+    }
+
+    // Artworks can be written by the artist who owns the folder.
+    // Reading is denied by default and will be handled by a Cloud Function generating a signed URL.
+    match /artworks/{artistId}/{allPaths=**} {
+      allow read: if false;
+      allow write: if request.auth != null && request.auth.uid == artistId;
     }
     
-    // Allow authenticated users to upload thumbnails
-    match /thumbnails/{userId}/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Deny all other access
-    match /{allPaths=**} {
-      allow read, write: if false;
+    // Allow users to upload attachments for their requirements
+    match /attachments/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
