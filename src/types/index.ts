@@ -1,16 +1,25 @@
+export interface Commission {
+  orderId: string;
+  commissionAmount: number;
+  earnedAt: Date;
+}
+
 export interface User {
   uid: string;
   email: string;
   displayName: string;
   photoURL?: string;
   phone?: string; // Added phone field
-  role: 'artist' | 'client' | 'admin';
+  role: 'artist' | 'client' | 'admin' | 'affiliate';
   createdAt: Date;
+  referralCode?: string;
+  referredBy?: string;
 }
 
 export interface Artist extends User {
   bio?: string;
   specialties: string[];
+  commissions?: Commission[];
   location?: string;
   website?: string;
   socialLinks?: {
@@ -18,6 +27,10 @@ export interface Artist extends User {
     twitter?: string;
     facebook?: string;
   };
+}
+
+export interface Affiliate extends User {
+  commissions?: Commission[];
 }
 
 export interface Artwork {
@@ -46,6 +59,7 @@ export interface Order {
   clientId: string;
   clientName: string;
   clientEmail: string;
+  affiliateId?: string;
   clientPhone: string;
   address: string;
   requirements?: string;

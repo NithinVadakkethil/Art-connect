@@ -4,7 +4,7 @@ import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Artist } from '../../types';
 import { Helmet } from 'react-helmet-async';
-import { User, Mail, MapPin, Globe, Instagram, Twitter, Facebook, Edit, Save, X } from 'lucide-react';
+import { User, Mail, MapPin, Globe, Instagram, Twitter, Facebook, Edit, Save, X, Copy } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Profile: React.FC = () => {
@@ -35,6 +35,13 @@ const Profile: React.FC = () => {
       const profileDoc = await getDoc(doc(db, 'users', currentUser.uid));
       if (profileDoc.exists()) {
         const profileData = profileDoc.data() as Artist;
+        if (!profileData.referralCode) {
+          const newReferralCode = currentUser.uid.slice(0, 8);
+          await updateDoc(doc(db, 'users', currentUser.uid), {
+            referralCode: newReferralCode
+          });
+          profileData.referralCode = newReferralCode;
+        }
         setProfile(profileData);
         setFormData({
           bio: profileData.bio || '',
@@ -180,6 +187,28 @@ const Profile: React.FC = () => {
                 </div> */}
               </div>
 
+              {/* Referral Link */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Your Referral Link</h3>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={`${window.location.origin}/register?ref=${profile.referralCode}`}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none"
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/register?ref=${profile.referralCode}`);
+                      toast.success('Referral link copied to clipboard!');
+                    }}
+                    className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    <Copy className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
               {/* Bio */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Biography</h3>
@@ -221,6 +250,47 @@ const Profile: React.FC = () => {
                       <p className="text-gray-500">No specialties added yet.</p>
                     )}
                   </div>
+                )}
+              </div>
+
+              {/* Commission Activity */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Commission Activity</h3>
+                {profile.commissions && profile.commissions.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Order ID
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Commission Amount
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date Earned
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {profile.commissions.map((commission, index) => (
+                          <tr key={index}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {commission.orderId}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
+                              ₹{commission.commissionAmount.toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {new Date(commission.earnedAt).toLocaleDateString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No commission activity yet.</p>
                 )}
               </div>
 

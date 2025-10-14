@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { doc, getDoc, addDoc, collection } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { useAuth } from "../contexts/AuthContext";
@@ -14,6 +14,7 @@ import {
   Mail,
   MessageSquare,
   Edit,
+  Share2,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -31,8 +32,16 @@ const ArtworkDetail: React.FC = () => {
     requirements: "",
     alterationDescription: "",
   });
+  const [affiliateId, setAffiliateId] = useState<string | null>(null);
+  const location = useLocation();
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const ref = params.get('affiliateId');
+    if (ref) {
+      setAffiliateId(ref);
+    }
+
     if (id) {
       fetchArtwork(id);
     }
@@ -71,7 +80,7 @@ const ArtworkDetail: React.FC = () => {
     }
 
     try {
-      await addDoc(collection(db, "orders"), {
+      const orderData: any = {
         artworkId: artwork.id,
         artistId: artwork.artistId,
         artistName: artwork.artistName,
@@ -91,7 +100,13 @@ const ArtworkDetail: React.FC = () => {
           category: artwork.category,
           isCustomizable: artwork.isCustomizable,
         },
-      });
+      };
+
+      if (affiliateId) {
+        orderData.affiliateId = affiliateId;
+      }
+
+      await addDoc(collection(db, "orders"), orderData);
 
       // Send email to Formspree
       await fetch("https://formspree.io/f/xeokbzrq", {
@@ -277,6 +292,20 @@ const ArtworkDetail: React.FC = () => {
                   <MessageSquare className="h-5 w-5" />
                   <span>Order This Artwork</span>
                 </button>
+
+                {currentUser && currentUser.role === 'affiliate' && (
+                  <button
+                    onClick={() => {
+                      const shareLink = `${window.location.origin}/artwork/${artwork.id}?affiliateId=${currentUser.uid}`;
+                      navigator.clipboard.writeText(shareLink);
+                      toast.success('Share link copied to clipboard!');
+                    }}
+                    className="w-full mt-4 bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                  >
+                    <Share2 className="h-5 w-5" />
+                    <span>Share This Artwork</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

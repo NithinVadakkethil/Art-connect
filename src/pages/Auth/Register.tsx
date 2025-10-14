@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Helmet } from "react-helmet-async";
 import { Eye, EyeOff, Palette, User, Users, Phone } from "lucide-react";
@@ -18,6 +18,16 @@ const Register: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const ref = params.get('ref');
+    if (ref) {
+      setReferralCode(ref);
+    }
+  }, [location.search]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -62,7 +72,8 @@ const Register: React.FC = () => {
         formData.password,
         formData.name,
         formData.role,
-        formData.phone
+        formData.phone,
+        referralCode
       );
       // Send data to Formspree
       await fetch("https://formspree.io/f/xldnylwy", {
@@ -136,6 +147,19 @@ const Register: React.FC = () => {
                 <User className="h-6 w-6 mx-auto mb-2" />
                 <div className="text-sm font-medium">Artist Signup</div>
                 <div className="text-xs text-gray-500">Showcase your work</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, role: 'affiliate' })}
+                className={`flex-1 p-4 border-2 rounded-lg transition-colors ${
+                  formData.role === 'affiliate'
+                    ? 'border-indigo-600 bg-indigo-50 text-indigo-600'
+                    : 'border-gray-300 hover:border-gray-400'
+                }`}
+              >
+                <Users className="h-6 w-6 mx-auto mb-2" />
+                <div className="text-sm font-medium">Affiliate Signup</div>
+                <div className="text-xs text-gray-500">Share artwork</div>
               </button>
               {/* <button
                 type="button"
