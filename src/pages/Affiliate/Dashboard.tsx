@@ -72,7 +72,7 @@ const Dashboard: React.FC = () => {
                         <tr key={index}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{commission.orderId}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">₹{commission.commissionAmount.toFixed(2)}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(commission.earnedAt).toLocaleDateString()}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{commission.earnedAt.toDate().toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>

@@ -1,7 +1,9 @@
+import { Timestamp } from "firebase/firestore";
+
 export interface Commission {
   orderId: string;
   commissionAmount: number;
-  earnedAt: Date;
+  earnedAt: Timestamp;
 }
 
 export interface User {
