@@ -1919,6 +1919,8 @@ import {
   addDoc,
   where,
   deleteDoc,
+  getDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { Order, ClientRequirement, User, SharedRequirement } from "../types";
@@ -1972,6 +1974,7 @@ const AdminDashboard: React.FC = () => {
   const [requirements, setRequirements] = useState<ClientRequirement[]>([]);
   const [sharedRequirements, setSharedRequirements] = useState<SharedRequirement[]>([]);
   const [artists, setArtists] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [filteredRequirements, setFilteredRequirements] = useState<
     ClientRequirement[]
@@ -2063,10 +2066,19 @@ const AdminDashboard: React.FC = () => {
         ...doc.data(),
       })) as User[];
 
+      // Fetch all users
+      const usersQuery = query(collection(db, "users"));
+      const usersSnapshot = await getDocs(usersQuery);
+      const usersList = usersSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as User[];
+
       setOrders(ordersList);
       setRequirements(requirementsList);
       setSharedRequirements(sharedRequirementsList);
       setArtists(artistsList);
+      setUsers(usersList);
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to load data");
@@ -2157,6 +2169,50 @@ const AdminDashboard: React.FC = () => {
         status,
         [`${status}At`]: new Date(),
       });
+
+      if (status === "completed") {
+        const order = orders.find((o) => o.id === orderId);
+        if (order && order.artwork.price) {
+          // Artist referral commission
+          const artistDoc = await getDoc(doc(db, "users", order.artistId));
+          if (artistDoc.exists()) {
+            const artist = artistDoc.data() as User;
+            if (artist.referredBy) {
+              const completedOrders = orders.filter(
+                (o) => o.artistId === order.artistId && o.status === "completed"
+              );
+
+              if (completedOrders.length === 0) {
+                const commissionAmount = order.artwork.price * 0.05;
+                await updateDoc(doc(db, "users", artist.referredBy), {
+                  commissions: arrayUnion({
+                    orderId: order.id,
+                    commissionAmount,
+                    earnedAt: new Date(),
+                  }),
+                });
+                toast.success(
+                  "Commission for first order awarded to referring artist!"
+                );
+              }
+            }
+          }
+
+          // Affiliate commission
+          if (order.affiliateId) {
+            const commissionAmount = order.artwork.price * 0.05;
+            await updateDoc(doc(db, "users", order.affiliateId), {
+              commissions: arrayUnion({
+                orderId: order.id,
+                commissionAmount,
+                earnedAt: new Date(),
+              }),
+            });
+            toast.success("Commission awarded to affiliate!");
+          }
+        }
+      }
+
       setOrders(
         orders.map((order) =>
           order.id === orderId ? { ...order, status } : order
@@ -2517,8 +2573,8 @@ ${
     }
   };
 
-  const getArtistContactInfo = (artistId: string) => {
-    return artists.find((artist) => artist.uid === artistId);
+  const getUserContactInfo = (userId: string) => {
+    return users.find((user) => user.uid === userId);
   };
 
   const formatTimestamp = (timestamp: any) => {
@@ -3281,7 +3337,7 @@ ${
                           Artist Information
                         </h4>
                         {(() => {
-                          const artistContact = getArtistContactInfo(
+                          const artistContact = getUserContactInfo(
                             selectedOrder.artistId
                           );
                           return artistContact ? (
@@ -3318,6 +3374,66 @@ ${
                           );
                         })()}
                       </div>
+
+                      {selectedOrder.affiliateId && (() => {
+                        const affiliateContact = getUserContactInfo(selectedOrder.affiliateId);
+                        return affiliateContact ? (
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-2">
+                              Affiliate Information
+                            </h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex items-center space-x-2">
+                                <UserIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                <span className="break-all">
+                                  {affiliateContact.displayName}
+                                </span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                <a
+                                  href={`mailto:${affiliateContact.email}`}
+                                  className="text-indigo-600 hover:text-indigo-800 break-all"
+                                >
+                                  {affiliateContact.email}
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null;
+                      })()}
+
+                      {(() => {
+                        const orderArtist = users.find(u => u.uid === selectedOrder.artistId);
+                        if (orderArtist && orderArtist.referredBy) {
+                          const referringUser = getUserContactInfo(orderArtist.referredBy);
+                          return referringUser ? (
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-2">
+                                Referred By (Commission Recipient)
+                              </h4>
+                              <div className="space-y-2 text-sm">
+                                <div className="flex items-center space-x-2">
+                                  <UserIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                  <span className="break-all">
+                                    {referringUser.displayName}
+                                  </span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                  <a
+                                    href={`mailto:${referringUser.email}`}
+                                    className="text-indigo-600 hover:text-indigo-800 break-all"
+                                  >
+                                    {referringUser.email}
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          ) : null;
+                        }
+                        return null;
+                      })()}
                     </div>
 
                     <div>

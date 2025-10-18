@@ -162,7 +162,7 @@ import {
   EmailAuthProvider,
   sendPasswordResetEmail
 } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 
 interface UserData {
@@ -177,7 +177,7 @@ interface UserData {
 interface AuthContextType {
   currentUser: UserData | null;
   login: (email: string, password: string) => Promise<UserData>;
-  register: (email: string, password: string, name: string, role: string, phone: string) => Promise<UserData>;
+  register: (email: string, password: string, name: string, role: string, phone: string, referralCode: string | null) => Promise<UserData>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
@@ -237,7 +237,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     password: string, 
     name: string, 
     role: string, 
-    phone: string
+    phone: string,
+    referralCode: string | null
   ): Promise<UserData> => {
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -251,15 +252,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: new Date(),
       };
 
-      // Save user data to Firestore
-      await setDoc(doc(db, 'users', result.user.uid), {
+      const userDoc: any = {
         displayName: name,
         email: result.user.email,
         role,
         phone,
         createdAt: new Date(),
         uid: result.user.uid,
-      });
+      };
+
+      if (referralCode) {
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('referralCode', '==', referralCode));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const referrer = querySnapshot.docs[0];
+          userDoc.referredBy = referrer.id;
+        }
+      }
+
+      // Save user data to Firestore
+      await setDoc(doc(db, 'users', result.user.uid), userDoc);
 
       setCurrentUser(userData);
       return userData;
