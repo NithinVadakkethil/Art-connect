@@ -90,6 +90,16 @@ const Header: React.FC = () => {
                 Admin
               </Link>
             )}
+            {currentUser?.role === 'affiliate' && (
+              <Link
+                to="/affiliate/dashboard"
+                className={`text-sm font-medium transition-colors ${
+                  isActive('/affiliate/dashboard') ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-900'
+                }`}
+              >
+                Dashboard
+              </Link>
+            )}
           </nav>
 
           {/* Desktop User Menu */}
@@ -209,6 +219,17 @@ const Header: React.FC = () => {
                       }`}
                     >
                       Admin
+                    </Link>
+                  )}
+                  {currentUser.role === 'affiliate' && (
+                    <Link
+                      to="/affiliate/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`text-sm font-medium transition-colors ${
+                        isActive('/affiliate/dashboard') ? 'text-indigo-600' : 'text-gray-500'
+                      }`}
+                    >
+                      Dashboard
                     </Link>
                   )}
                   <div className="flex items-center space-x-2 pt-2 border-t border-gray-200">

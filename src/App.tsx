@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-import AdminSetup from './components/AdminSetup';
+import AffiliateDashboard from './pages/Affiliate/Dashboard';
 import Home from './pages/Home';
 import Gallery from './pages/Gallery';
 import ArtworkDetail from './pages/ArtworkDetail';
@@ -55,6 +55,16 @@ function App() {
                   element={
                     <ProtectedRoute allowedRoles={['admin']}>
                       <AdminDashboard />
+                    </ProtectedRoute>
+                  } 
+                />
+
+                {/* Affiliate Routes */}
+                <Route 
+                  path="/affiliate/dashboard" 
+                  element={
+                    <ProtectedRoute allowedRoles={['affiliate']}>
+                      <AffiliateDashboard />
                     </ProtectedRoute>
                   } 
                 />
