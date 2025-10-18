@@ -1,38 +1,71 @@
-
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../config/firebase';
-import { collection, getDocs, query } from 'firebase/firestore';
-import { Artwork, Affiliate } from '../../types';
+import { collection, getDocs, query, doc, getDoc } from 'firebase/firestore';
+import { Artwork, Affiliate, Commission, Order } from '../../types';
 import { Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 
-const Dashboard: React.FC = () => {
+const AffiliateDashboard: React.FC = () => {
   const { currentUser } = useAuth();
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
+  const [affiliate, setAffiliate] = useState<Affiliate | null>(null);
+  const [enrichedCommissions, setEnrichedCommissions] = useState<(Commission & { artworkName?: string; artistName?: string })[]>([]);
 
   useEffect(() => {
-    const fetchArtworks = async () => {
+    const fetchArtworksAndAffiliate = async () => {
       try {
+        // Fetch Artworks
         const artworksQuery = query(collection(db, 'artworks'));
         const querySnapshot = await getDocs(artworksQuery);
         const artworksList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Artwork));
         setArtworks(artworksList);
+
+        // Fetch latest affiliate data
+        if (currentUser) {
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+                const affiliateData = userDocSnap.data() as Affiliate;
+                setAffiliate(affiliateData);
+                if (affiliateData.commissions) {
+                  enrichCommissions(affiliateData.commissions);
+                }
+            }
+        }
+
       } catch (error) {
-        console.error("Error fetching artworks: ", error);
-        toast.error("Could not load artworks.");
+        console.error("Error fetching data: ", error);
+        toast.error("Could not load dashboard data.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchArtworks();
-  }, []);
+    const enrichCommissions = async (commissions: Commission[]) => {
+      const enriched = await Promise.all(commissions.map(async (commission) => {
+        const orderDocRef = doc(db, 'orders', commission.orderId);
+        const orderDocSnap = await getDoc(orderDocRef);
+        if (orderDocSnap.exists()) {
+          const orderData = orderDocSnap.data() as Order;
+          return {
+            ...commission,
+            artworkName: orderData.artwork.title,
+            artistName: orderData.artistName,
+          };
+        }
+        return commission;
+      }));
+      setEnrichedCommissions(enriched);
+    };
 
-  const totalCommissions = (currentUser as Affiliate)?.commissions?.reduce((acc, commission) => acc + commission.commissionAmount, 0) || 0;
+    fetchArtworksAndAffiliate();
+  }, [currentUser]);
+
+  const totalCommissions = affiliate?.commissions?.reduce((acc, commission) => acc + commission.commissionAmount, 0) || 0;
 
   return (
     <>
@@ -57,20 +90,22 @@ const Dashboard: React.FC = () => {
           <div className="mb-8">
             <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Commission History</h2>
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              {(currentUser as Affiliate)?.commissions && (currentUser as Affiliate).commissions!.length > 0 ? (
+              {enrichedCommissions.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Artwork Name</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Artist Name</th>
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {(currentUser as Affiliate).commissions!.map((commission, index) => (
+                      {enrichedCommissions.map((commission, index) => (
                         <tr key={index}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{commission.orderId}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{commission.artworkName || 'N/A'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{commission.artistName || 'N/A'}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">₹{commission.commissionAmount.toFixed(2)}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{commission.earnedAt.toDate().toLocaleDateString()}</td>
                         </tr>
@@ -85,7 +120,7 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* Artwork Gallery */}
-          <div>
+          {/* <div>
             <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">Share Artwork & Earn</h2>
             {loading ? (
               <div className="text-center">
@@ -118,11 +153,11 @@ const Dashboard: React.FC = () => {
                 ))}
               </div>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
     </>
   );
 };
 
-export default Dashboard;
+export default AffiliateDashboard;
