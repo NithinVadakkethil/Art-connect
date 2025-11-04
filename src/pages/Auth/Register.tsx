@@ -161,7 +161,7 @@ const Register: React.FC = () => {
                 <div className="text-sm font-medium">Affiliate Signup</div>
                 <div className="text-xs text-gray-500">Share artwork</div>
               </button>
-              {/* <button
+              <button
                 type="button"
                 onClick={() => setFormData({ ...formData, role: 'client' })}
                 className={`flex-1 p-4 border-2 rounded-lg transition-colors ${
@@ -173,7 +173,7 @@ const Register: React.FC = () => {
                 <Users className="h-6 w-6 mx-auto mb-2" />
                 <div className="text-sm font-medium">Client</div>
                 <div className="text-xs text-gray-500">Discover art</div>
-              </button> */}
+              </button>
             </div>
 
             <div className="rounded-md shadow-sm space-y-4">

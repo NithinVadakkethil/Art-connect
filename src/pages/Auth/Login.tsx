@@ -30,7 +30,7 @@ const Login: React.FC = () => {
       } else if (user.role === 'artist') {
         navigate('/dashboard');
       } else if (user.role === 'client') {
-        navigate('/requirements');
+        navigate('/customer-dashboard');
       } else {
         // Fallback to home for any other role
         navigate('/');
