@@ -16,6 +16,7 @@ import Profile from './pages/Artist/Profile';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import ClientRequirements from './pages/Client/ClientRequirements';
 import ForgotPassword from './pages/Auth/ForgotPassword';
+import CustomerDashboard from './pages/Client/CustomerDashboard';
 
 function App() {
   return (
@@ -67,6 +68,14 @@ function App() {
                       <AffiliateDashboard />
                     </ProtectedRoute>
                   } 
+                />
+                 <Route
+                  path="customer-dashboard"
+                  element={
+                    <ProtectedRoute allowedRoles={['client']}>
+                      <CustomerDashboard />
+                    </ProtectedRoute>
+                  }
                 />
               </Route>
               

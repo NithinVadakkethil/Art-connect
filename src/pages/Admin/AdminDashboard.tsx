@@ -1924,6 +1924,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { Order, ClientRequirement, User, SharedRequirement } from "../types";
+import ArtistProfiles from "./ArtistProfiles";
 import { Helmet } from "react-helmet-async";
 import {
   Users,
@@ -1980,9 +1981,9 @@ const AdminDashboard: React.FC = () => {
     ClientRequirement[]
   >([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"orders" | "requirements">(
-    "orders"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "orders" | "requirements" | "artist-profiles"
+  >("orders");
   const [showShareModal, setShowShareModal] = useState(false);
   const [showShareAllModal, setShowShareAllModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
@@ -2594,6 +2595,458 @@ ${
     setShowImageModal(true);
   };
 
+  const renderTabContent = () => {
+    if (activeTab === "orders") {
+      return (
+        <div className="space-y-4">
+          {/* Mobile Filter Toggle */}
+          <div className="sm:hidden">
+            <button
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+            >
+              <div className="flex items-center space-x-2">
+                <Filter className="h-5 w-5 text-gray-400" />
+                <span className="text-sm font-medium text-gray-700">
+                  Filter Orders
+                </span>
+              </div>
+              <ChevronDown
+                className={`h-5 w-5 text-gray-400 transition-transform ${
+                  showMobileFilters ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Orders Filter - Desktop */}
+          <div className="hidden sm:grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                type="text"
+                placeholder="Search orders..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={orderSearchTerm}
+                onChange={(e) => setOrderSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <select
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                value={orderStatusFilter}
+                onChange={(e) => setOrderStatusFilter(e.target.value)}
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="shared">Shared</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Orders Filter - Mobile */}
+          {showMobileFilters && (
+            <div className="sm:hidden space-y-3 mb-6 bg-gray-50 p-4 rounded-lg">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  type="text"
+                  placeholder="Search orders..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  value={orderSearchTerm}
+                  onChange={(e) => setOrderSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <select
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                  value={orderStatusFilter}
+                  onChange={(e) => setOrderStatusFilter(e.target.value)}
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="shared">Shared</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {filteredOrders.length === 0 ? (
+            <div className="text-center py-12">
+              <ShoppingBag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No orders found
+              </h3>
+              <p className="text-gray-600 text-sm sm:text-base">
+                {orderSearchTerm || orderStatusFilter !== "all"
+                  ? "Try adjusting your search or filter criteria"
+                  : "Orders will appear here when clients place them"}
+              </p>
+            </div>
+          ) : (
+            filteredOrders.map((order) => (
+              <div
+                key={order.id}
+                className="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start space-x-3 sm:space-x-4 flex-1">
+                    <div
+                      className="cursor-pointer flex-shrink-0"
+                      onClick={() =>
+                        openImageModal(order.artwork.imageUrl)
+                      }
+                    >
+                      <img
+                        src={order.artwork.imageUrl}
+                        alt={order.artwork.title}
+                        className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg hover:opacity-80 transition-opacity"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
+                        {order.artwork.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-600 truncate">
+                        by {order.artistName}
+                      </p>
+                      {order.artwork.price && (
+                        <p className="text-xs sm:text-sm font-medium text-green-600">
+                          ₹{order.artwork.price}
+                        </p>
+                      )}
+                      {order.status === "cancelled" &&
+                        order.declineReason && (
+                          <p className="text-xs text-red-600 mt-1 line-clamp-2">
+                            Declined: {order.declineReason}
+                          </p>
+                        )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 sm:items-center">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                        order.status
+                      )} whitespace-nowrap`}
+                    >
+                      {order.status.charAt(0).toUpperCase() +
+                        order.status.slice(1)}
+                    </span>
+                    <div className="flex space-x-1 sm:space-x-2">
+                      {order.status === "pending" && (
+                        <button
+                          onClick={() =>
+                            handleShareOrderWithArtist(order)
+                          }
+                          className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 transition-colors flex items-center space-x-1"
+                        >
+                          <Send className="h-3 w-3" />
+                          <span className="hidden sm:inline">
+                            Share
+                          </span>
+                        </button>
+                      )}
+                      {order.status === "cancelled" && (
+                        <button
+                          onClick={() => shareOrderToWhatsApp(order)}
+                          className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors flex items-center space-x-1"
+                          title="Share to WhatsApp Group"
+                        >
+                          <WhatsAppIcon className="h-3 w-3" />
+                          <span className="hidden sm:inline">
+                            WhatsApp
+                          </span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          setSelectedOrder(order);
+                          setShowOrderModal(true);
+                        }}
+                        className="bg-gray-600 text-white px-2 py-1 rounded text-xs hover:bg-gray-700 transition-colors flex items-center space-x-1"
+                      >
+                        <Eye className="h-3 w-3" />
+                        <span className="hidden sm:inline">View</span>
+                      </button>
+                      <button
+                        onClick={() => deleteOrder(order.id)}
+                        className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors flex items-center space-x-1"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        <span className="hidden sm:inline">Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-xs text-gray-500">
+                  Order Date: {formatTimestamp(order.orderDate)}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      );
+    } else if (activeTab === "requirements") {
+      return (
+        <div className="space-y-4">
+          {/* Mobile Filter Toggle */}
+          <div className="sm:hidden">
+            <button
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+            >
+              <div className="flex items-center space-x-2">
+                <Filter className="h-5 w-5 text-gray-400" />
+                <span className="text-sm font-medium text-gray-700">
+                  Filter Requirements
+                </span>
+              </div>
+              <ChevronDown
+                className={`h-5 w-5 text-gray-400 transition-transform ${
+                  showMobileFilters ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Requirements Filter - Desktop */}
+          <div className="hidden sm:grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                type="text"
+                placeholder="Search requirements..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={requirementSearchTerm}
+                onChange={(e) =>
+                  setRequirementSearchTerm(e.target.value)
+                }
+              />
+            </div>
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <select
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                value={requirementStatusFilter}
+                onChange={(e) =>
+                  setRequirementStatusFilter(e.target.value)
+                }
+              >
+                <option value="all">All Status</option>
+                <option value="open">Open</option>
+                <option value="shared">Shared</option>
+                <option value="assigned">Assigned</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Requirements Filter - Mobile */}
+          {showMobileFilters && (
+            <div className="sm:hidden space-y-3 mb-6 bg-gray-50 p-4 rounded-lg">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  type="text"
+                  placeholder="Search requirements..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  value={requirementSearchTerm}
+                  onChange={(e) =>
+                    setRequirementSearchTerm(e.target.value)
+                  }
+                />
+              </div>
+              <div className="relative">
+                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <select
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                  value={requirementStatusFilter}
+                  onChange={(e) =>
+                    setRequirementStatusFilter(e.target.value)
+                  }
+                >
+                  <option value="all">All Status</option>
+                  <option value="open">Open</option>
+                  <option value="shared">Shared</option>
+                  <option value="assigned">Assigned</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {filteredRequirements.length === 0 ? (
+            <div className="text-center py-12">
+              <MessageSquare className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No requirements found
+              </h3>
+              <p className="text-gray-600 text-sm sm:text-base">
+                {requirementSearchTerm ||
+                requirementStatusFilter !== "all"
+                  ? "Try adjusting your search or filter criteria"
+                  : "Client requirements will appear here"}
+              </p>
+            </div>
+          ) : (
+            filteredRequirements.map((requirement) => (
+              <div
+                key={requirement.id}
+                className="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
+                      Requirement #{requirement.id.slice(-6)}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-600 truncate">
+                      {requirement.clientName}
+                    </p>
+                    {requirement.sharedWith &&
+                      requirement.sharedWith.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          <span className="text-xs text-blue-600 font-medium">
+                            Shared with:
+                          </span>
+                          {requirement.sharedWith
+                            .slice(0, 3)
+                            .map((artistId, index) => {
+                              const artist = artists.find(
+                                (a) => a.uid === artistId
+                              );
+                              const artistStatus = getArtistResponseStatus(requirement.id, artistId);
+                              const isAccepted = artistStatus === 'accepted';
+                              const isDeclined = artistStatus === 'declined';
+                              const declineReason = getArtistDeclineReason(requirement.id, artistId);
+
+                              return (
+                                <span
+                                  key={artistId}
+                                  className={`text-xs px-2 py-1 rounded-full ${
+                                    isAccepted
+                                      ? "bg-green-100 text-green-800"
+                                      : isDeclined
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-blue-100 text-blue-800"
+                                  }`}
+                                  title={isDeclined && declineReason ? `Declined: ${declineReason}` : ''}
+                                >
+                                  {artist?.displayName?.split(" ")[0] ||
+                                    "Unknown"}
+                                  {isAccepted && " ✓"}
+                                  {isDeclined && " ✗"}
+                                </span>
+                              );
+                            })}
+                          {requirement.sharedWith.length > 3 && (
+                            <span className="text-xs text-gray-500">
+                              +{requirement.sharedWith.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+                  </div>
+
+                  <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 sm:items-center">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                        requirement.status
+                      )} whitespace-nowrap`}
+                    >
+                      {requirement.status.charAt(0).toUpperCase() +
+                        requirement.status.slice(1)}
+                    </span>
+                    <div className="flex space-x-1 sm:space-x-2">
+                      {requirement.status === "open" && (
+                        <>
+                          <button
+                            onClick={() => {
+                              setSelectedRequirement(requirement);
+                              setShowShareAllModal(true);
+                            }}
+                            className="bg-purple-600 text-white px-2 py-1 rounded text-xs hover:bg-purple-700 transition-colors flex items-center space-x-1"
+                          >
+                            <Users className="h-3 w-3" />
+                            <span className="hidden sm:inline">
+                              Share All
+                            </span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedRequirement(requirement);
+                              setShowShareModal(true);
+                            }}
+                            className="bg-indigo-600 text-white px-2 py-1 rounded text-xs hover:bg-indigo-700 transition-colors flex items-center space-x-1"
+                          >
+                            <Share2 className="h-3 w-3" />
+                            <span className="hidden sm:inline">
+                              Share
+                            </span>
+                          </button>
+                        </>
+                      )}
+                      <button
+                        onClick={() =>
+                          shareRequirementToWhatsApp(requirement)
+                        }
+                        className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors flex items-center space-x-1"
+                        title="Share to WhatsApp Group"
+                      >
+                        <WhatsAppIcon className="h-3 w-3" />
+                        <span className="hidden sm:inline">
+                          WhatsApp
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedRequirement(requirement);
+                          setShowRequirementModal(true);
+                        }}
+                        className="bg-gray-600 text-white px-2 py-1 rounded text-xs hover:bg-gray-700 transition-colors flex items-center space-x-1"
+                      >
+                        <Eye className="h-3 w-3" />
+                        <span className="hidden sm:inline">View</span>
+                      </button>
+                      <button
+                        onClick={() =>
+                          deleteRequirement(requirement.id)
+                        }
+                        className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors flex items-center space-x-1"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        <span className="hidden sm:inline">Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-xs text-gray-500">
+                  Created: {formatTimestamp(requirement.createdAt)}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      );
+    } else if (activeTab === "artist-profiles") {
+      return <ArtistProfiles artists={artists} />;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -2714,454 +3167,20 @@ ${
                 >
                   Requirements ({filteredRequirements.length})
                 </button>
+                <button
+                  onClick={() => setActiveTab("artist-profiles")}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-.r(nowrap ${
+                    activeTab === "artist-profiles"
+                      ? "border-indigo-500 text-indigo-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Artist Profiles ({artists.length})
+                </button>
               </nav>
             </div>
 
-            <div className="p-4 sm:p-6">
-              {activeTab === "orders" ? (
-                <div className="space-y-4">
-                  {/* Mobile Filter Toggle */}
-                  <div className="sm:hidden">
-                    <button
-                      onClick={() => setShowMobileFilters(!showMobileFilters)}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <Filter className="h-5 w-5 text-gray-400" />
-                        <span className="text-sm font-medium text-gray-700">
-                          Filter Orders
-                        </span>
-                      </div>
-                      <ChevronDown
-                        className={`h-5 w-5 text-gray-400 transition-transform ${
-                          showMobileFilters ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  {/* Orders Filter - Desktop */}
-                  <div className="hidden sm:grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                      <input
-                        type="text"
-                        placeholder="Search orders..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        value={orderSearchTerm}
-                        onChange={(e) => setOrderSearchTerm(e.target.value)}
-                      />
-                    </div>
-                    <div className="relative">
-                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                      <select
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
-                        value={orderStatusFilter}
-                        onChange={(e) => setOrderStatusFilter(e.target.value)}
-                      >
-                        <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="shared">Shared</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="in-progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Orders Filter - Mobile */}
-                  {showMobileFilters && (
-                    <div className="sm:hidden space-y-3 mb-6 bg-gray-50 p-4 rounded-lg">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                        <input
-                          type="text"
-                          placeholder="Search orders..."
-                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          value={orderSearchTerm}
-                          onChange={(e) => setOrderSearchTerm(e.target.value)}
-                        />
-                      </div>
-                      <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                        <select
-                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
-                          value={orderStatusFilter}
-                          onChange={(e) => setOrderStatusFilter(e.target.value)}
-                        >
-                          <option value="all">All Status</option>
-                          <option value="pending">Pending</option>
-                          <option value="shared">Shared</option>
-                          <option value="confirmed">Confirmed</option>
-                          <option value="in-progress">In Progress</option>
-                          <option value="completed">Completed</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
-
-                  {filteredOrders.length === 0 ? (
-                    <div className="text-center py-12">
-                      <ShoppingBag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        No orders found
-                      </h3>
-                      <p className="text-gray-600 text-sm sm:text-base">
-                        {orderSearchTerm || orderStatusFilter !== "all"
-                          ? "Try adjusting your search or filter criteria"
-                          : "Orders will appear here when clients place them"}
-                      </p>
-                    </div>
-                  ) : (
-                    filteredOrders.map((order) => (
-                      <div
-                        key={order.id}
-                        className="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4"
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-start space-x-3 sm:space-x-4 flex-1">
-                            <div
-                              className="cursor-pointer flex-shrink-0"
-                              onClick={() =>
-                                openImageModal(order.artwork.imageUrl)
-                              }
-                            >
-                              <img
-                                src={order.artwork.imageUrl}
-                                alt={order.artwork.title}
-                                className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg hover:opacity-80 transition-opacity"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
-                                {order.artwork.title}
-                              </h3>
-                              <p className="text-xs sm:text-sm text-gray-600 truncate">
-                                by {order.artistName}
-                              </p>
-                              {order.artwork.price && (
-                                <p className="text-xs sm:text-sm font-medium text-green-600">
-                                  ₹{order.artwork.price}
-                                </p>
-                              )}
-                              {order.status === "cancelled" &&
-                                order.declineReason && (
-                                  <p className="text-xs text-red-600 mt-1 line-clamp-2">
-                                    Declined: {order.declineReason}
-                                  </p>
-                                )}
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 sm:items-center">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                                order.status
-                              )} whitespace-nowrap`}
-                            >
-                              {order.status.charAt(0).toUpperCase() +
-                                order.status.slice(1)}
-                            </span>
-                            <div className="flex space-x-1 sm:space-x-2">
-                              {order.status === "pending" && (
-                                <button
-                                  onClick={() =>
-                                    handleShareOrderWithArtist(order)
-                                  }
-                                  className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 transition-colors flex items-center space-x-1"
-                                >
-                                  <Send className="h-3 w-3" />
-                                  <span className="hidden sm:inline">
-                                    Share
-                                  </span>
-                                </button>
-                              )}
-                              {order.status === "cancelled" && (
-                                <button
-                                  onClick={() => shareOrderToWhatsApp(order)}
-                                  className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors flex items-center space-x-1"
-                                  title="Share to WhatsApp Group"
-                                >
-                                  <WhatsAppIcon className="h-3 w-3" />
-                                  <span className="hidden sm:inline">
-                                    WhatsApp
-                                  </span>
-                                </button>
-                              )}
-                              <button
-                                onClick={() => {
-                                  setSelectedOrder(order);
-                                  setShowOrderModal(true);
-                                }}
-                                className="bg-gray-600 text-white px-2 py-1 rounded text-xs hover:bg-gray-700 transition-colors flex items-center space-x-1"
-                              >
-                                <Eye className="h-3 w-3" />
-                                <span className="hidden sm:inline">View</span>
-                              </button>
-                              <button
-                                onClick={() => deleteOrder(order.id)}
-                                className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors flex items-center space-x-1"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                                <span className="hidden sm:inline">Delete</span>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="text-xs text-gray-500">
-                          Order Date: {formatTimestamp(order.orderDate)}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Mobile Filter Toggle */}
-                  <div className="sm:hidden">
-                    <button
-                      onClick={() => setShowMobileFilters(!showMobileFilters)}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <Filter className="h-5 w-5 text-gray-400" />
-                        <span className="text-sm font-medium text-gray-700">
-                          Filter Requirements
-                        </span>
-                      </div>
-                      <ChevronDown
-                        className={`h-5 w-5 text-gray-400 transition-transform ${
-                          showMobileFilters ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  {/* Requirements Filter - Desktop */}
-                  <div className="hidden sm:grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                      <input
-                        type="text"
-                        placeholder="Search requirements..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        value={requirementSearchTerm}
-                        onChange={(e) =>
-                          setRequirementSearchTerm(e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="relative">
-                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                      <select
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
-                        value={requirementStatusFilter}
-                        onChange={(e) =>
-                          setRequirementStatusFilter(e.target.value)
-                        }
-                      >
-                        <option value="all">All Status</option>
-                        <option value="open">Open</option>
-                        <option value="shared">Shared</option>
-                        <option value="assigned">Assigned</option>
-                        <option value="in-progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Requirements Filter - Mobile */}
-                  {showMobileFilters && (
-                    <div className="sm:hidden space-y-3 mb-6 bg-gray-50 p-4 rounded-lg">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                        <input
-                          type="text"
-                          placeholder="Search requirements..."
-                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          value={requirementSearchTerm}
-                          onChange={(e) =>
-                            setRequirementSearchTerm(e.target.value)
-                          }
-                        />
-                      </div>
-                      <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                        <select
-                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
-                          value={requirementStatusFilter}
-                          onChange={(e) =>
-                            setRequirementStatusFilter(e.target.value)
-                          }
-                        >
-                          <option value="all">All Status</option>
-                          <option value="open">Open</option>
-                          <option value="shared">Shared</option>
-                          <option value="assigned">Assigned</option>
-                          <option value="in-progress">In Progress</option>
-                          <option value="completed">Completed</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
-
-                  {filteredRequirements.length === 0 ? (
-                    <div className="text-center py-12">
-                      <MessageSquare className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        No requirements found
-                      </h3>
-                      <p className="text-gray-600 text-sm sm:text-base">
-                        {requirementSearchTerm ||
-                        requirementStatusFilter !== "all"
-                          ? "Try adjusting your search or filter criteria"
-                          : "Client requirements will appear here"}
-                      </p>
-                    </div>
-                  ) : (
-                    filteredRequirements.map((requirement) => (
-                      <div
-                        key={requirement.id}
-                        className="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4"
-                      >
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
-                              Requirement #{requirement.id.slice(-6)}
-                            </h3>
-                            <p className="text-xs sm:text-sm text-gray-600 truncate">
-                              {requirement.clientName}
-                            </p>
-                            {requirement.sharedWith &&
-                              requirement.sharedWith.length > 0 && (
-                                <div className="mt-2 flex flex-wrap gap-1">
-                                  <span className="text-xs text-blue-600 font-medium">
-                                    Shared with:
-                                  </span>
-                                  {requirement.sharedWith
-                                    .slice(0, 3)
-                                    .map((artistId, index) => {
-                                      const artist = artists.find(
-                                        (a) => a.uid === artistId
-                                      );
-                                      const artistStatus = getArtistResponseStatus(requirement.id, artistId);
-                                      const isAccepted = artistStatus === 'accepted';
-                                      const isDeclined = artistStatus === 'declined';
-                                      const declineReason = getArtistDeclineReason(requirement.id, artistId);
-
-                                      return (
-                                        <span
-                                          key={artistId}
-                                          className={`text-xs px-2 py-1 rounded-full ${
-                                            isAccepted
-                                              ? "bg-green-100 text-green-800"
-                                              : isDeclined
-                                              ? "bg-red-100 text-red-800"
-                                              : "bg-blue-100 text-blue-800"
-                                          }`}
-                                          title={isDeclined && declineReason ? `Declined: ${declineReason}` : ''}
-                                        >
-                                          {artist?.displayName?.split(" ")[0] ||
-                                            "Unknown"}
-                                          {isAccepted && " ✓"}
-                                          {isDeclined && " ✗"}
-                                        </span>
-                                      );
-                                    })}
-                                  {requirement.sharedWith.length > 3 && (
-                                    <span className="text-xs text-gray-500">
-                                      +{requirement.sharedWith.length - 3} more
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                          </div>
-
-                          <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 sm:items-center">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                                requirement.status
-                              )} whitespace-nowrap`}
-                            >
-                              {requirement.status.charAt(0).toUpperCase() +
-                                requirement.status.slice(1)}
-                            </span>
-                            <div className="flex space-x-1 sm:space-x-2">
-                              {requirement.status === "open" && (
-                                <>
-                                  <button
-                                    onClick={() => {
-                                      setSelectedRequirement(requirement);
-                                      setShowShareAllModal(true);
-                                    }}
-                                    className="bg-purple-600 text-white px-2 py-1 rounded text-xs hover:bg-purple-700 transition-colors flex items-center space-x-1"
-                                  >
-                                    <Users className="h-3 w-3" />
-                                    <span className="hidden sm:inline">
-                                      Share All
-                                    </span>
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setSelectedRequirement(requirement);
-                                      setShowShareModal(true);
-                                    }}
-                                    className="bg-indigo-600 text-white px-2 py-1 rounded text-xs hover:bg-indigo-700 transition-colors flex items-center space-x-1"
-                                  >
-                                    <Share2 className="h-3 w-3" />
-                                    <span className="hidden sm:inline">
-                                      Share
-                                    </span>
-                                  </button>
-                                </>
-                              )}
-                              <button
-                                onClick={() =>
-                                  shareRequirementToWhatsApp(requirement)
-                                }
-                                className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition-colors flex items-center space-x-1"
-                                title="Share to WhatsApp Group"
-                              >
-                                <WhatsAppIcon className="h-3 w-3" />
-                                <span className="hidden sm:inline">
-                                  WhatsApp
-                                </span>
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setSelectedRequirement(requirement);
-                                  setShowRequirementModal(true);
-                                }}
-                                className="bg-gray-600 text-white px-2 py-1 rounded text-xs hover:bg-gray-700 transition-colors flex items-center space-x-1"
-                              >
-                                <Eye className="h-3 w-3" />
-                                <span className="hidden sm:inline">View</span>
-                              </button>
-                              <button
-                                onClick={() =>
-                                  deleteRequirement(requirement.id)
-                                }
-                                className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition-colors flex items-center space-x-1"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                                <span className="hidden sm:inline">Delete</span>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="text-xs text-gray-500">
-                          Created: {formatTimestamp(requirement.createdAt)}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
+            <div className="p-4 sm:p-6">{renderTabContent()}</div>
           </div>
         </div>
 
