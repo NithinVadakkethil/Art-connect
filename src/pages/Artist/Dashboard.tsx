@@ -3,7 +3,7 @@ import { collection, getDocs, query, where, orderBy, addDoc, updateDoc, doc, del
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import { Artwork, SharedRequirement, SharedOrder } from '../types';
+import { Artwork, SharedRequirement, SharedOrder } from '../../types';
 import { Helmet } from 'react-helmet-async';
 import { Plus, Upload, Edit, Trash2, Eye, Check, X, Clock, IndianRupee, User, Calendar, MessageSquare, Palette, Search, Filter, ZoomIn, UserCheck, AlertCircle, Lock, CheckCircle, Share, MessageCircle } from 'lucide-react';
 import { compressImage, createThumbnail } from '../../utils/imageOptimization';
@@ -244,7 +244,7 @@ const Dashboard: React.FC = () => {
         title: editFormData.title,
         description: editFormData.description,
         category: editFormData.category,
-        price: editFormData.price ? parseFloat(editFormData.price) : null,
+        price: parseFloat(editFormData.price),
         isCustomizable: editFormData.isCustomizable,
         tags: editFormData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
         updatedAt: new Date()
@@ -1299,16 +1299,17 @@ Please review and take necessary action.`;
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Price (INR)
+                      Price (INR) *
                     </label>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
+                      required
                       value={uploadFormData.price}
                       onChange={(e) => setUploadFormData({...uploadFormData, price: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                      placeholder="Optional price"
+                      placeholder="Enter price"
                     />
                   </div>
                   
@@ -1462,16 +1463,17 @@ Please review and take necessary action.`;
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Price (INR)
+                      Price (INR) *
                     </label>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
+                      required
                       value={editFormData.price}
                       onChange={(e) => setEditFormData({...editFormData, price: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                      placeholder="Optional price"
+                      placeholder="Enter price"
                     />
                   </div>
                   

@@ -17,7 +17,7 @@ interface UserData {
   uid: string;
   email: string;
   displayName: string;
-  role: 'artist' | 'client' | 'admin';
+  role: 'artist' | 'client' | 'affiliate' | 'admin';
   phone?: string;
   createdAt: Date;
 }
@@ -95,7 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uid: result.user.uid,
         email: result.user.email!,
         displayName: name,
-        role: role as 'artist' | 'client' | 'admin',
+        role: role as 'artist' | 'client' | 'affiliate' | 'admin',
         phone,
         createdAt: new Date(),
       };
