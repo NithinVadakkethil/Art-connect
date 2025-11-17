@@ -1,0 +1,162 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - generic [ref=e7]:
+      - link "FrameGlobe Logo FrameGlobe" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - img "FrameGlobe Logo" [ref=e9]
+        - generic [ref=e10]: FrameGlobe
+      - navigation [ref=e11]:
+        - link "Home" [ref=e12] [cursor=pointer]:
+          - /url: /
+        - link "Gallery" [ref=e13] [cursor=pointer]:
+          - /url: /gallery
+        - link "Custom Art" [ref=e14] [cursor=pointer]:
+          - /url: /requirements
+      - generic [ref=e16]:
+        - link "Login" [ref=e17] [cursor=pointer]:
+          - /url: /login
+        - link "Sign Up" [ref=e18] [cursor=pointer]:
+          - /url: /register
+  - main [ref=e19]:
+    - generic [ref=e24]:
+      - heading "Where Art Meets Passion" [level=1] [ref=e25]:
+        - text: Where Art Meets
+        - generic [ref=e26]: Passion
+      - paragraph [ref=e27]: Join the world's most vibrant community of artists and art enthusiasts. Discover extraordinary artworks, connect with talented creators, and bring your artistic visions to life.
+      - generic [ref=e28]:
+        - link "Explore Masterpieces" [ref=e29] [cursor=pointer]:
+          - /url: /gallery
+          - text: Explore Masterpieces
+          - img [ref=e30]
+        - link "Start Creating Today" [ref=e32] [cursor=pointer]:
+          - /url: /register
+    - generic [ref=e34]:
+      - heading "Empowering Artists, Inspiring Collectors" [level=2] [ref=e35]
+      - paragraph [ref=e36]: FrameGlobe is more than a marketplace—it's a thriving ecosystem where creativity flourishes. We bridge the gap between visionary artists and passionate collectors, fostering meaningful connections that celebrate the transformative power of art.
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - heading "Why Artists & Collectors Choose Us" [level=2] [ref=e40]
+        - paragraph [ref=e41]: Experience the future of art discovery and creation with our innovative platform designed for the modern art world.
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - img [ref=e45]
+          - heading "Curated Excellence" [level=3] [ref=e51]
+          - paragraph [ref=e52]: Discover handpicked artworks from verified artists across painting, digital art, sculpture, and photography.
+        - generic [ref=e53]:
+          - img [ref=e55]
+          - heading "Direct Connections" [level=3] [ref=e60]
+          - paragraph [ref=e61]: Connect directly with artists for custom commissions, collaborations, and personalized artwork creation.
+        - generic [ref=e62]:
+          - img [ref=e64]
+          - heading "Trusted Platform" [level=3] [ref=e66]
+          - paragraph [ref=e67]: Secure transactions, verified artists, and quality assurance ensure a safe and reliable art buying experience.
+        - generic [ref=e68]:
+          - img [ref=e70]
+          - heading "Global Community" [level=3] [ref=e73]
+          - paragraph [ref=e74]: Join thousands of artists and collectors from around the world in celebrating creativity and artistic expression.
+    - generic [ref=e78]:
+      - 'heading "For Artists: Your Canvas, Your Career" [level=2] [ref=e79]'
+      - generic [ref=e80]:
+        - generic [ref=e81]:
+          - img [ref=e83]
+          - generic [ref=e86]:
+            - heading "Showcase Your Talent" [level=3] [ref=e87]
+            - paragraph [ref=e88]: Create a stunning portfolio that highlights your unique artistic style and attracts the right collectors.
+        - generic [ref=e89]:
+          - img [ref=e91]
+          - generic [ref=e93]:
+            - heading "Build Your Following" [level=3] [ref=e94]
+            - paragraph [ref=e95]: Connect with art enthusiasts who appreciate your work and grow a loyal community of supporters.
+        - generic [ref=e96]:
+          - img [ref=e98]
+          - generic [ref=e100]:
+            - heading "Earn From Your Passion" [level=3] [ref=e101]
+            - paragraph [ref=e102]: Turn your artistic passion into a sustainable career with our commission and sales platform.
+      - link "Join as Artist" [ref=e104] [cursor=pointer]:
+        - /url: /register
+        - text: Join as Artist
+        - img [ref=e105]
+    - generic [ref=e111]:
+      - img [ref=e114]
+      - generic [ref=e116]:
+        - 'heading "For Collectors: Discover Your Next Treasure" [level=2] [ref=e117]'
+        - generic [ref=e118]:
+          - generic [ref=e119]:
+            - img [ref=e121]
+            - generic [ref=e123]:
+              - heading "Unique Artworks" [level=3] [ref=e124]
+              - paragraph [ref=e125]: Discover one-of-a-kind pieces that speak to your soul and complement your personal style.
+          - generic [ref=e126]:
+            - img [ref=e128]
+            - generic [ref=e133]:
+              - heading "Custom Commissions" [level=3] [ref=e134]
+              - paragraph [ref=e135]: Work directly with artists to create personalized pieces that perfectly match your vision and space.
+          - generic [ref=e136]:
+            - img [ref=e138]
+            - generic [ref=e140]:
+              - heading "Secure Purchases" [level=3] [ref=e141]
+              - paragraph [ref=e142]: Buy with confidence knowing every transaction is protected and every artist is verified.
+        - link "Start Collecting" [ref=e144] [cursor=pointer]:
+          - /url: /gallery
+          - text: Start Collecting
+          - img [ref=e145]
+    - generic [ref=e149]:
+      - heading "Ready to Transform Your Art Journey?" [level=2] [ref=e150]
+      - paragraph [ref=e151]: Join thousands of artists and collectors who are already part of the FrameGlobe community. Your next masterpiece or perfect artwork is just a click away.
+      - generic [ref=e152]:
+        - link "Join as Artist" [ref=e153] [cursor=pointer]:
+          - /url: /register
+        - link "Browse Gallery" [ref=e154] [cursor=pointer]:
+          - /url: /gallery
+        - link "Custom Art" [ref=e155] [cursor=pointer]:
+          - /url: /requirements
+  - contentinfo [ref=e156]:
+    - generic [ref=e157]:
+      - generic [ref=e158]:
+        - generic [ref=e159]:
+          - generic [ref=e160]:
+            - img "FrameGlobe Logo" [ref=e161]
+            - generic [ref=e162]: FrameGlobe
+          - paragraph [ref=e163]: Connecting talented artists with art enthusiasts worldwide. Discover unique artworks and support independent artists.
+          - generic [ref=e164]:
+            - link "Facebook" [ref=e165] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e166]: Facebook
+              - img [ref=e167]
+            - link "Instagram" [ref=e169] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e170]: Instagram
+              - img [ref=e171]
+            - link "Twitter" [ref=e173] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e174]: Twitter
+              - img [ref=e175]
+        - generic [ref=e177]:
+          - heading "Quick Links" [level=3] [ref=e178]
+          - list [ref=e179]:
+            - listitem [ref=e180]:
+              - link "Home" [ref=e181] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=e182]:
+              - link "Gallery" [ref=e183] [cursor=pointer]:
+                - /url: /gallery
+            - listitem [ref=e184]:
+              - link "Custom Art" [ref=e185] [cursor=pointer]:
+                - /url: /requirements
+        - generic [ref=e186]:
+          - heading "Contact Info" [level=3] [ref=e187]
+          - generic [ref=e188]:
+            - generic [ref=e189]:
+              - img [ref=e190]
+              - generic [ref=e193]: frameglobe.store@gmail.com
+            - generic [ref=e194]:
+              - img [ref=e195]
+              - generic [ref=e197]: +971 (56) 1196530
+            - generic [ref=e198]:
+              - img [ref=e199]
+              - generic [ref=e202]: UAE, INDIA
+      - paragraph [ref=e204]: © 2024 FrameGlobe. All rights reserved. Empowering artists worldwide.
+```

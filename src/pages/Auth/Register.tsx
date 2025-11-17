@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { Helmet } from "react-helmet-async";
 import { Eye, EyeOff, Palette, User, Users, Phone } from "lucide-react";
@@ -16,8 +16,19 @@ const Register: React.FC = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const ref = params.get('ref');
+    if (ref) {
+      setReferralCode(ref);
+    }
+  }, [location.search]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -41,16 +52,22 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (loading) return;
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long");
       return;
     }
 
     if (!validatePhone(formData.phone)) {
-      alert(
-        "Please enter a valid phone number.\nIndia: +91 followed by 10 digits (starting with 6-9)\nUAE: +971 followed by 9 digits (starting with 5)"
+      setError(
+        "Please enter a valid phone number (e.g., +919876543210 or +971501234567)"
       );
       return;
     }
@@ -62,25 +79,31 @@ const Register: React.FC = () => {
         formData.password,
         formData.name,
         formData.role,
-        formData.phone
+        formData.phone,
+        referralCode
       );
-      // Send data to Formspree
-      await fetch("https://formspree.io/f/xldnylwy", {
+      
+      // Formspree submission is optional, can be removed if not needed
+      fetch("https://formspree.io/f/xldnylwy", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
-          message: `New Artist signup.\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}`,
+          role: formData.role,
+          message: `New ${formData.role} signup.`,
         }),
-      });
+      }).catch(err => console.error("Formspree error:", err)); // Log error but don't block user flow
+      
       navigate("/dashboard");
-    } catch (error) {
-      console.error("Registration error:", error);
+    } catch (err: any) {
+      if (err.message.includes("auth/email-already-in-use")) {
+        setError("This email is already in use. Please use a different email or log in.");
+      } else {
+        setError(err.message || "An unexpected error occurred. Please try again.");
+      }
+      console.error("Registration error:", err);
     } finally {
       setLoading(false);
     }
@@ -122,6 +145,12 @@ const Register: React.FC = () => {
           </div>
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span className="block sm:inline">{error}</span>
+              </div>
+            )}
+            
             {/* Role Selection */}
             <div className="flex space-x-4">
               <button
@@ -137,7 +166,20 @@ const Register: React.FC = () => {
                 <div className="text-sm font-medium">Artist Signup</div>
                 <div className="text-xs text-gray-500">Showcase your work</div>
               </button>
-              {/* <button
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, role: 'affiliate' })}
+                className={`flex-1 p-4 border-2 rounded-lg transition-colors ${
+                  formData.role === 'affiliate'
+                    ? 'border-indigo-600 bg-indigo-50 text-indigo-600'
+                    : 'border-gray-300 hover:border-gray-400'
+                }`}
+              >
+                <Users className="h-6 w-6 mx-auto mb-2" />
+                <div className="text-sm font-medium">Affiliate Signup</div>
+                <div className="text-xs text-gray-500">Share artwork</div>
+              </button>
+              <button
                 type="button"
                 onClick={() => setFormData({ ...formData, role: 'client' })}
                 className={`flex-1 p-4 border-2 rounded-lg transition-colors ${
@@ -149,7 +191,7 @@ const Register: React.FC = () => {
                 <Users className="h-6 w-6 mx-auto mb-2" />
                 <div className="text-sm font-medium">Client</div>
                 <div className="text-xs text-gray-500">Discover art</div>
-              </button> */}
+              </button>
             </div>
 
             <div className="rounded-md shadow-sm space-y-4">
