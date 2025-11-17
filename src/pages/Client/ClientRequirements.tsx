@@ -78,8 +78,8 @@ const ClientRequirements: React.FC = () => {
       // Upload attachment if provided
       if (formData.attachment) {
         setUploadProgress(true);
-        // const CLOUD_NAME = "dn2i2gk5y"; //live
-        const CLOUD_NAME = "dlsgpthqy"; //test
+        const CLOUD_NAME = "dn2i2gk5y"; //live
+        // const CLOUD_NAME = "dlsgpthqy"; //test
         const UPLOAD_PRESET = "artist_upload_preset";
         const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 

@@ -257,8 +257,8 @@ const Dashboard: React.FC = () => {
         const thumbnailFile = await createThumbnail(editFormData.file);
 
         // Upload to Cloudinary
-        // const CLOUD_NAME = 'dn2i2gk5y'; //live
-        const CLOUD_NAME = "dlsgpthqy"; //test
+        const CLOUD_NAME = 'dn2i2gk5y'; //live
+        // const CLOUD_NAME = "dlsgpthqy"; //test
         const UPLOAD_PRESET = 'artist_upload_preset';
         const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
@@ -330,8 +330,8 @@ const Dashboard: React.FC = () => {
       const thumbnailFile = await createThumbnail(uploadFormData.file);
 
       // Upload to Cloudinary
-      // const CLOUD_NAME = 'dn2i2gk5y'; //live
-      const CLOUD_NAME = "dlsgpthqy"; //test
+      const CLOUD_NAME = 'dn2i2gk5y'; //live
+      // const CLOUD_NAME = "dlsgpthqy"; //test
       const UPLOAD_PRESET = 'artist_upload_preset';
       const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 
