@@ -1,3 +1,10 @@
 
 > artist-showcase-webapp@1.0.0 dev
 > vite
+
+Re-optimizing dependencies because lockfile has changed
+
+  VITE v5.4.8  ready in 609 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
